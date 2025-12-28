@@ -1,6 +1,6 @@
 # build outputs
-# dist/
-# **/dist/
+dist/
+**/dist/
 
 # dependencies
 node_modules/
