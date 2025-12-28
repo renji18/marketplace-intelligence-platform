@@ -5,7 +5,7 @@ function App() {
   const [greeting, setGreeting] = useState("")
 
   useEffect(() => {
-    fetch("/api")
+    fetch(import.meta.env.VITE_AUTOSOFT_BASE_API_URL)
       .then((res) => res.text())
       .then(setGreeting)
   }, [])

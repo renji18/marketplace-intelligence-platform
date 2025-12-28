@@ -22,7 +22,20 @@
     "noUnusedParameters": true,
     "erasableSyntaxOnly": true,
     "noFallthroughCasesInSwitch": true,
-    "noUncheckedSideEffectImports": true
+    "noUncheckedSideEffectImports": true,
+    "baseUrl": ".",
+    "paths": {
+      "@/*": ["src/*"],
+      "@api/*": ["src/api/index.ts"],
+      "@assets/*": ["src/assets/*"],
+      "@components/*": ["src/components/*"],
+      "@hooks/*": ["src/hooks/*"],
+      "@interfaces/*": ["src/interfaces/*"],
+      "@pages/*": ["src/pages/*"],
+      "@redux/*": ["src/redux/*"],
+      "@ui/*": ["src/ui/*"],
+      "@utils/*": ["src/utils/*"]
+    }
   },
-  "include": ["src"]
+  "include": ["src/**/*"]
 }
