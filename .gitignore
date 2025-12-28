@@ -1,0 +1,16 @@
+# build outputs
+dist/
+**/dist/
+
+# dependencies
+node_modules/
+
+# env
+.env
+.env.*
+
+# misc
+coverage/
+
+# turbo
+.turbo/
