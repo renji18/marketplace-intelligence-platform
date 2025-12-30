@@ -1,6 +1,7 @@
 import { defineConfig } from "vite"
 import react from "@vitejs/plugin-react"
 import * as path from "node:path"
+import tailwindcss from "@tailwindcss/vite"
 
 // https://vite.dev/config/
 export default defineConfig({
@@ -13,10 +14,10 @@ export default defineConfig({
       "@hooks": path.resolve(__dirname, "./src/hooks"),
       "@interfaces": path.resolve(__dirname, "./src/interfaces"),
       "@pages": path.resolve(__dirname, "./src/pages"),
-      "@redux": path.resolve(__dirname, "./src/redux"),
+      "@zustand": path.resolve(__dirname, "./src/zustand"),
       "@ui": path.resolve(__dirname, "./src/ui"),
       "@utils": path.resolve(__dirname, "./src/utils"),
     },
   },
-  plugins: [react()],
+  plugins: [react(), tailwindcss()],
 })

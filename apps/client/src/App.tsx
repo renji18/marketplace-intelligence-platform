@@ -1,26 +1,7 @@
-import { useEffect, useState } from "react"
-import "./App.css"
-
-function App() {
-  const [greeting, setGreeting] = useState("")
-
-  useEffect(() => {
-    fetch(import.meta.env.VITE_AUTOSOFT_BASE_API_URL)
-      .then((res) => res.text())
-      .then(setGreeting)
-  }, [])
-
+const App = () => {
   return (
-    <div style={{ backgroundColor: "red" }}>
-      <h1>{greeting}</h1>
-      <div className="card">
-        <p>
-          Edit <code>src/App.tsx</code> and save to test HMR
-        </p>
-      </div>
-      <p className="read-the-docs">
-        Click on the Vite and React logos to learn more
-      </p>
+    <div className="h-screen w-screen flex items-center justify-center text-2xl font-bold italic underline tracking-wider text-emerald-800">
+      App
     </div>
   )
 }

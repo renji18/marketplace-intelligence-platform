@@ -7,15 +7,16 @@ async function bootstrap() {
   app.setGlobalPrefix('api');
 
   app.enableCors({
-    origin: (origin, callback) => {
-      callback(null, process.env.CLIENT_URL);
-    },
+    origin: process.env.CLIENT_URL,
     credentials: true,
     methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'],
     allowedHeaders: ['Content-Type', 'Authorization'],
     exposedHeaders: ['Set-Cookie'],
   });
 
-  await app.listen(process.env.PORT ?? 3000);
+  await app.listen(process.env.PORT ?? 8080);
 }
-bootstrap();
+
+bootstrap().then(() =>
+  console.log(`Server is running on port ${process.env.port ?? 8080}`),
+);

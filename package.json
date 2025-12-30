@@ -11,7 +11,9 @@
   "scripts": {
     "dev": "turbo run dev",
     "build": "turbo run build --output public",
-    "start": "node apps/api/dist/main"
+    "start": "node apps/api/dist/main",
+    "install:be": "npm install --workspace api ",
+    "install:fe": "npm install --workspace client "
   },
   "workspaces": [
     "apps/*"

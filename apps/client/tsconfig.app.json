@@ -32,7 +32,7 @@
       "@hooks/*": ["src/hooks/*"],
       "@interfaces/*": ["src/interfaces/*"],
       "@pages/*": ["src/pages/*"],
-      "@redux/*": ["src/redux/*"],
+      "@zustand/*": ["src/zustand/*"],
       "@ui/*": ["src/ui/*"],
       "@utils/*": ["src/utils/*"]
     }
