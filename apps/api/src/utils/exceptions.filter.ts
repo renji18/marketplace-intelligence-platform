@@ -6,14 +6,14 @@ import {
   HttpStatus,
   Injectable,
 } from '@nestjs/common';
-import { PrismaClientKnownRequestError } from '@prisma/client/runtime/client';
-import { Request, Response } from 'express';
 import {
   PrismaClientInitializationError,
+  PrismaClientKnownRequestError,
   PrismaClientRustPanicError,
   PrismaClientUnknownRequestError,
   PrismaClientValidationError,
-} from 'generated/prisma/internal/prismaNamespace';
+} from '@prisma/client/runtime/client';
+import { Request, Response } from 'express';
 
 @Catch()
 @Injectable()

@@ -1,6 +1,6 @@
 generator client {
   provider = "prisma-client"
-  output   = "../generated/prisma"
+  output   = "./generated/prisma"
 }
 
 datasource db {
@@ -17,7 +17,7 @@ model User {
 
   auth   Auth?
   seller Seller?
-  buyer Buyer?
+  buyer  Buyer?
   admin  Admin?
 
   createdAt DateTime @default(now())
@@ -71,11 +71,11 @@ model Admin {
 }
 
 model Company {
-  id        String  @id @default(uuid(7))
-  name      String
+  id         String  @id @default(uuid(7))
+  name       String
   isVerified Boolean @default(false)
-  isPrimary Boolean @default(false)
-  isDeleted Boolean @default(false)
+  isPrimary  Boolean @default(false)
+  isDeleted  Boolean @default(false)
 
   owner    Seller    @relation(fields: [ownerId], references: [id], onDelete: Cascade)
   ownerId  String
