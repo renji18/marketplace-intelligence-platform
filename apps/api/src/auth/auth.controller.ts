@@ -3,6 +3,7 @@ import {
   Controller,
   Get,
   InternalServerErrorException,
+  NotFoundException,
   Post,
   Req,
   Res,
@@ -18,15 +19,11 @@ import { Public } from './utils/public.decorator';
 export class AuthController {
   constructor(private readonly authService: AuthService) {}
 
-  // Token max age set to 30 days
-  private readonly TOKEN_MAX_AGE = 1000 * 60 * 60 * 24 * 30;
-
   private getCookieOptions() {
     return {
       httpOnly: true,
       signed: true,
       path: '/',
-      maxAge: this.TOKEN_MAX_AGE,
       sameSite: 'none' as const,
       secure: true,
     };
@@ -53,6 +50,11 @@ export class AuthController {
         tokens.access_token,
         this.getCookieOptions(),
       )
+      .cookie(
+        envData().refresh_cookie,
+        tokens.refresh_token,
+        this.getCookieOptions(),
+      )
       .status(200)
       .json({ message: 'OTP sent successfully' });
   }
@@ -70,15 +72,36 @@ export class AuthController {
     } else {
       res
         .clearCookie(envData().access_cookie, this.getCookieOptions())
+        .clearCookie(envData().refresh_cookie, this.getCookieOptions())
         .status(400)
         .json({ message: 'Invalid or Expired OTP. Login again.' });
     }
+  }
+
+  @Public()
+  @Get('refresh')
+  async refreshToken(@Req() req: Request, @Res() res: Response) {
+    const refreshToken = req.signedCookies[envData().refresh_cookie];
+
+    if (!refreshToken) {
+      throw new NotFoundException('Refresh token missing');
+    }
+
+    const accessToken = await this.authService.refreshToken(refreshToken);
+
+    res
+      .cookie(envData().access_cookie, accessToken, this.getCookieOptions())
+      .status(200)
+      .json({
+        message: 'Token refreshed',
+      });
   }
 
   @Get('logout')
   async logout(@Res() res: Response) {
     res
       .clearCookie(envData().access_cookie, this.getCookieOptions())
+      .clearCookie(envData().refresh_cookie, this.getCookieOptions())
       .status(200)
       .json({ message: 'Logged out successfully' });
   }

@@ -167,6 +167,31 @@ export class AuthService {
     });
   };
 
+  refreshToken = async (token: string) => {
+    const payload: PayloadInterface = await this.jwtService.verifyAsync(token, {
+      secret: envData().refresh_secret,
+    });
+
+    const user = await prisma.user.findUnique({
+      where: { id: payload.userId },
+      select: { id: true, auth: { select: { isDeleted: true } } },
+    });
+
+    if (!user || user?.auth?.isDeleted) {
+      throw new NotFoundException('User not found');
+    }
+
+    delete payload['iat'];
+    delete payload['exp'];
+
+    const accessToken = await this.jwtService.signAsync(payload, {
+      secret: envData().access_secret,
+      expiresIn: envData().access_expiry,
+    });
+
+    return accessToken;
+  };
+
   // ============================= PRIVATE METHODS =============================
 
   private _generateTokens = async (payload: PayloadInterface) => {
@@ -174,6 +199,10 @@ export class AuthService {
       access_token: await this.jwtService.signAsync(payload, {
         secret: envData().access_secret,
         expiresIn: envData().access_expiry,
+      }),
+      refresh_token: await this.jwtService.signAsync(payload, {
+        secret: envData().refresh_secret,
+        expiresIn: envData().refresh_expiry,
       }),
     };
   };
