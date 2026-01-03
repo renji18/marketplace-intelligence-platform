@@ -1,18 +1,21 @@
 import { NestFactory } from '@nestjs/core';
 import { AppModule } from './app.module';
 import * as cookieParser from 'cookie-parser';
-import { envData } from './utils/env.manager';
 import { ValidationPipe } from '@nestjs/common';
-import { AllExceptionsFilter } from './utils/exceptions.filter';
+import { ConfigService } from '@nestjs/config';
+import { AllExceptionsFilter } from './config/exceptions-filter.service';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
 
+  const configService = app.get(ConfigService);
+  const env = configService.get('env', { infer: true });
+
   app.setGlobalPrefix('api');
-  app.use(cookieParser(envData().cookie_secret));
+  app.use(cookieParser(env.cookie_secret));
 
   app.enableCors({
-    origin: process.env.CLIENT_URL,
+    origin: env.client_url,
     credentials: true,
     methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'],
     allowedHeaders: ['Content-Type', 'Authorization'],
@@ -31,9 +34,8 @@ async function bootstrap() {
   // Global exception filter for handling errors
   app.useGlobalFilters(new AllExceptionsFilter());
 
-  await app.listen(process.env.PORT ?? 8080);
+  await app.listen(env.port ?? 8080);
+  console.log(`Server is running on port ${env.port}`);
 }
 
-bootstrap().then(() =>
-  console.log(`Server is running on port ${process.env.port ?? 8080}`),
-);
+bootstrap();

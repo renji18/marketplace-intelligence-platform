@@ -8,13 +8,14 @@ import { JwtService } from '@nestjs/jwt';
 import { Request } from 'express';
 import { Reflector } from '@nestjs/core';
 import { IS_PUBLIC_KEY } from './public.decorator';
-import { envData } from 'src/utils/env.manager';
+import { EnvConfigService } from 'src/config/env-manager.service';
 
 @Injectable()
 export class AuthGuard implements CanActivate {
   constructor(
     private readonly jwtService: JwtService,
     private readonly reflector: Reflector,
+    private readonly envService: EnvConfigService,
   ) {}
 
   async canActivate(context: ExecutionContext): Promise<boolean> {
@@ -28,7 +29,10 @@ export class AuthGuard implements CanActivate {
     }
 
     const request = context.switchToHttp().getRequest();
-    const token = this.extractTokenFromHeader(request);
+    const token = this.extractTokenFromHeader(
+      request,
+      this.envService.cookieOptions.access_cookie,
+    );
 
     if (!token) {
       throw new UnauthorizedException();
@@ -45,7 +49,10 @@ export class AuthGuard implements CanActivate {
     return true;
   }
 
-  private extractTokenFromHeader(request: Request): string | undefined {
-    return request.signedCookies?.[envData().access_cookie];
+  private extractTokenFromHeader(
+    request: Request,
+    access_cookie: string,
+  ): string | undefined {
+    return request.signedCookies?.[access_cookie];
   }
 }

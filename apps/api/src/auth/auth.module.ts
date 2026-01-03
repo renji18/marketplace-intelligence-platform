@@ -2,16 +2,19 @@ import { Module } from '@nestjs/common';
 import { AuthController } from './auth.controller';
 import { AuthService } from './auth.service';
 import { JwtModule } from '@nestjs/jwt';
-import { jwtConstants } from './utils/jwt.constant';
 import { APP_GUARD } from '@nestjs/core';
 import { AuthGuard } from './utils/auth.guard';
 import { RolesGuard } from './utils/roles.guard';
+import { EnvConfigService } from 'src/config/env-manager.service';
 
 @Module({
   imports: [
-    JwtModule.register({
+    JwtModule.registerAsync({
       global: true,
-      secret: jwtConstants.secret,
+      inject: [EnvConfigService],
+      useFactory: (envConfig: EnvConfigService) => ({
+        secret: envConfig.accessTokenOptions.secret,
+      }),
     }),
   ],
   controllers: [AuthController],

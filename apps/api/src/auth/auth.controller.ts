@@ -12,12 +12,22 @@ import { AuthService } from './auth.service';
 import { RegisterDto } from './dto/register.dto';
 import { LoginDto } from './dto/login.dto';
 import { Request, Response } from 'express';
-import { envData } from 'src/utils/env.manager';
 import { Public } from './utils/public.decorator';
+import { EnvConfigService } from 'src/config/env-manager.service';
 
 @Controller('auth')
 export class AuthController {
-  constructor(private readonly authService: AuthService) {}
+  private readonly cookies: {
+    access_cookie: string;
+    refresh_cookie: string;
+  };
+
+  constructor(
+    private readonly authService: AuthService,
+    private readonly envService: EnvConfigService,
+  ) {
+    this.cookies = this.envService.cookieOptions;
+  }
 
   private getCookieOptions() {
     return {
@@ -46,12 +56,12 @@ export class AuthController {
 
     res
       .cookie(
-        envData().access_cookie,
+        this.cookies.access_cookie,
         tokens.access_token,
         this.getCookieOptions(),
       )
       .cookie(
-        envData().refresh_cookie,
+        this.cookies.refresh_cookie,
         tokens.refresh_token,
         this.getCookieOptions(),
       )
@@ -71,8 +81,8 @@ export class AuthController {
       res.json({ message: 'Logged in successfully' });
     } else {
       res
-        .clearCookie(envData().access_cookie, this.getCookieOptions())
-        .clearCookie(envData().refresh_cookie, this.getCookieOptions())
+        .clearCookie(this.cookies.access_cookie, this.getCookieOptions())
+        .clearCookie(this.cookies.refresh_cookie, this.getCookieOptions())
         .status(400)
         .json({ message: 'Invalid or Expired OTP. Login again.' });
     }
@@ -81,7 +91,7 @@ export class AuthController {
   @Public()
   @Get('refresh')
   async refreshToken(@Req() req: Request, @Res() res: Response) {
-    const refreshToken = req.signedCookies[envData().refresh_cookie];
+    const refreshToken = req.signedCookies[this.cookies.refresh_cookie];
 
     if (!refreshToken) {
       throw new NotFoundException('Refresh token missing');
@@ -90,7 +100,7 @@ export class AuthController {
     const accessToken = await this.authService.refreshToken(refreshToken);
 
     res
-      .cookie(envData().access_cookie, accessToken, this.getCookieOptions())
+      .cookie(this.cookies.access_cookie, accessToken, this.getCookieOptions())
       .status(200)
       .json({
         message: 'Token refreshed',
@@ -100,8 +110,8 @@ export class AuthController {
   @Get('logout')
   async logout(@Res() res: Response) {
     res
-      .clearCookie(envData().access_cookie, this.getCookieOptions())
-      .clearCookie(envData().refresh_cookie, this.getCookieOptions())
+      .clearCookie(this.cookies.access_cookie, this.getCookieOptions())
+      .clearCookie(this.cookies.refresh_cookie, this.getCookieOptions())
       .status(200)
       .json({ message: 'Logged out successfully' });
   }

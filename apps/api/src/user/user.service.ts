@@ -1,6 +1,6 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
-import { PayloadInterface } from 'src/auth/utils/payload';
-import { prisma } from 'src/config/db';
+import { PayloadInterface } from 'src/interface/payload.interface';
+import { prisma } from 'src/db/db';
 
 @Injectable()
 export class UserService {

@@ -5,17 +5,20 @@ import {
   NotFoundException,
 } from '@nestjs/common';
 import { RegisterDto, Roles } from './dto/register.dto';
-import { prisma } from 'src/config/db';
+import { prisma } from 'src/db/db';
 import { generateOTP, hashPassword, verifyPassword } from 'src/utils/password';
 import { LoginDto } from './dto/login.dto';
 import { JwtService } from '@nestjs/jwt';
-import { envData } from 'src/utils/env.manager';
 import { ALLOWED_ROLES } from './utils/roles.decorator';
-import { PayloadInterface } from './utils/payload';
+import { PayloadInterface } from '../interface/payload.interface';
+import { EnvConfigService } from 'src/config/env-manager.service';
 
 @Injectable()
 export class AuthService {
-  constructor(private readonly jwtService: JwtService) {}
+  constructor(
+    private readonly jwtService: JwtService,
+    private readonly envService: EnvConfigService,
+  ) {}
 
   register = async (body: RegisterDto) => {
     const user = await prisma.user.findUnique({
@@ -169,7 +172,7 @@ export class AuthService {
 
   refreshToken = async (token: string) => {
     const payload: PayloadInterface = await this.jwtService.verifyAsync(token, {
-      secret: envData().refresh_secret,
+      secret: this.envService.refreshTokenOptions.secret,
     });
 
     const user = await prisma.user.findUnique({
@@ -185,8 +188,8 @@ export class AuthService {
     delete payload['exp'];
 
     const accessToken = await this.jwtService.signAsync(payload, {
-      secret: envData().access_secret,
-      expiresIn: envData().access_expiry,
+      secret: this.envService.accessTokenOptions.secret,
+      expiresIn: this.envService.accessTokenOptions.expiresIn,
     });
 
     return accessToken;
@@ -197,12 +200,12 @@ export class AuthService {
   private _generateTokens = async (payload: PayloadInterface) => {
     return {
       access_token: await this.jwtService.signAsync(payload, {
-        secret: envData().access_secret,
-        expiresIn: envData().access_expiry,
+        secret: this.envService.accessTokenOptions.secret,
+        expiresIn: this.envService.accessTokenOptions.expiresIn,
       }),
       refresh_token: await this.jwtService.signAsync(payload, {
-        secret: envData().refresh_secret,
-        expiresIn: envData().refresh_expiry,
+        secret: this.envService.refreshTokenOptions.secret,
+        expiresIn: this.envService.refreshTokenOptions.expiresIn,
       }),
     };
   };

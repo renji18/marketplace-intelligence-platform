@@ -4,7 +4,7 @@ import {
   InternalServerErrorException,
 } from '@nestjs/common';
 import { CreateAdminDto } from './dto/create.admin.dto';
-import { prisma } from 'src/config/db';
+import { prisma } from 'src/db/db';
 import { hashPassword } from 'src/utils/password';
 
 @Injectable()
