@@ -14,6 +14,7 @@ import { LoginDto } from './dto/login.dto';
 import { Request, Response } from 'express';
 import { Public } from './utils/public.decorator';
 import { EnvConfigService } from 'src/config/env-manager.service';
+import { AccessWithoutVerification } from './utils/access-without-verification.decorator';
 
 @Controller('auth')
 export class AuthController {
@@ -69,16 +70,29 @@ export class AuthController {
       .json({ message: 'OTP sent successfully' });
   }
 
+  @AccessWithoutVerification()
   @Post('verify-otp')
   async verifyOtp(
     @Req() req: Request,
     @Body() body: { otp: string },
     @Res() res: Response,
   ) {
-    const verified = await this.authService.verifyOtp(req['user'], body.otp);
+    const tokens = await this.authService.verifyOtp(req['user'], body.otp);
 
-    if (verified) {
-      res.json({ message: 'Logged in successfully' });
+    if (tokens) {
+      res
+        .cookie(
+          this.cookies.access_cookie,
+          tokens.access_token,
+          this.getCookieOptions(),
+        )
+        .cookie(
+          this.cookies.refresh_cookie,
+          tokens.refresh_token,
+          this.getCookieOptions(),
+        )
+        .status(200)
+        .json({ message: 'Logged in successfully' });
     } else {
       res
         .clearCookie(this.cookies.access_cookie, this.getCookieOptions())
@@ -107,6 +121,7 @@ export class AuthController {
       });
   }
 
+  @AccessWithoutVerification()
   @Get('logout')
   async logout(@Res() res: Response) {
     res

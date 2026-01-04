@@ -1,5 +1,6 @@
 import {
   BadRequestException,
+  ForbiddenException,
   Injectable,
   InternalServerErrorException,
   NotFoundException,
@@ -166,7 +167,16 @@ export class AuthService {
         },
       });
 
-      return true;
+      const newPayload: PayloadInterface = {
+        email: payload.email,
+        userId: payload.userId,
+        role: payload.role,
+        verified: true,
+      };
+
+      const tokens = await this._generateTokens(newPayload);
+
+      return tokens;
     });
   };
 
@@ -174,6 +184,10 @@ export class AuthService {
     const payload: PayloadInterface = await this.jwtService.verifyAsync(token, {
       secret: this.envService.refreshTokenOptions.secret,
     });
+
+    if (!payload.verified) {
+      throw new ForbiddenException('Please verify yourself first');
+    }
 
     const user = await prisma.user.findUnique({
       where: { id: payload.userId },
