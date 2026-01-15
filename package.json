@@ -15,7 +15,7 @@
   "scripts": {
     "dev": "turbo run dev",
     "build": "turbo run build --output public",
-    "start": "node apps/api/dist/main",
+    "start": "docker compose up -d && npm run dev",
     "install:be": "npm install --workspace api ",
     "install:fe": "npm install --workspace client "
   },
