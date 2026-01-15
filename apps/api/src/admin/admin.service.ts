@@ -10,7 +10,7 @@ import { hashPassword } from 'src/utils/password';
 @Injectable()
 export class AdminService {
   createAdmin = async (body: CreateAdminDto) => {
-    return { message: 'CHECK SERVICE FILE' };
+    return { message: 'CHECK CONTROLLER FILE' };
 
     const admin = await prisma.admin.findFirst({
       where: { user: { email: body.email } },
