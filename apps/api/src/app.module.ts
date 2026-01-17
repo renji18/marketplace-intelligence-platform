@@ -3,7 +3,6 @@ import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { AuthModule } from './auth/auth.module';
 import { AdminModule } from './admin/admin.module';
-import { SellerModule } from './seller/seller.module';
 import { BuyerModule } from './buyer/buyer.module';
 import { CompanyModule } from './company/company.module';
 import { ProductModule } from './product/product.module';
@@ -21,7 +20,6 @@ import { GlobalModule } from './config/global.module';
     GlobalModule,
     AuthModule,
     AdminModule,
-    SellerModule,
     BuyerModule,
     CompanyModule,
     ProductModule,

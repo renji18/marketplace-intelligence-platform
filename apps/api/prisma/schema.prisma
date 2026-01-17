@@ -11,7 +11,7 @@ model User {
   id          String  @id @default(uuid(7))
   firstName   String
   lastName    String
-  email       String  @unique
+  email       String
   phoneNumber String?
   isActive    Boolean @default(true)
 
@@ -22,6 +22,8 @@ model User {
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
+
+  @@unique([email])
 }
 
 model Auth {
@@ -32,42 +34,50 @@ model Auth {
   isDeleted     Boolean   @default(false)
 
   user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
-  userId String @unique
+  userId String
 
   createdAt DateTime  @default(now())
   updatedAt DateTime  @updatedAt
   deletedAt DateTime?
+
+  @@unique([userId])
 }
 
 model Seller {
   id String @id @default(uuid(7))
 
-  user      User      @relation(fields: [userId], references: [id], onDelete: Cascade)
-  userId    String    @unique
-  companies Company[]
+  user    User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  userId  String
+  company Company?
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
+
+  @@unique([userId])
 }
 
 model Buyer {
   id String @id @default(uuid(7))
 
   user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
-  userId String @unique
+  userId String
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
+
+  @@unique([userId])
 }
 
 model Admin {
   id String @id @default(uuid(7))
 
   user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
-  userId String @unique
+  userId String
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
+
+  @@unique([userId])
 }
 
 model Company {
@@ -81,9 +91,11 @@ model Company {
   ownerId  String
   products Product[]
 
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-  deletedAt DateTime
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+  deletedAt DateTime?
+
+  @@unique([ownerId])
 }
 
 model Product {
@@ -99,9 +111,9 @@ model Product {
   productCategory   ProductCategory @relation(fields: [productCategoryId], references: [id], onDelete: Cascade)
   productCategoryId String
 
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-  deletedAt DateTime
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+  deletedAt DateTime?
 
   @@unique([name, companyId])
 }
@@ -130,11 +142,13 @@ model ProductImage {
 }
 
 model ProductCategory {
-  id       String @id @default(uuid(7))
-  category String
+  id   String @id @default(uuid(7))
+  name String
 
   products Product[]
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
+
+  @@unique([name])
 }

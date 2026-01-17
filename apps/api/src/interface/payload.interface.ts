@@ -1,6 +1,7 @@
 export interface PayloadInterface {
   email: string;
   userId: string;
-  role: string;
+  roleName: string;
+  roleId: string;
   verified: boolean;
 }
