@@ -1,7 +1,7 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { ProductDto } from './dto/product.dto';
 import { prisma } from 'src/db/db';
-import { getUuid } from 'src/utils/getUuid';
+import { getNewId } from 'src/utils/getNewId';
 
 @Injectable()
 export class ProductService {
@@ -72,7 +72,7 @@ export class ProductService {
       // product
       const product = await tx.product.upsert({
         where: {
-          id: body.id ?? getUuid(),
+          id: body.id ?? getNewId(),
         },
         update: {
           name: body.name,

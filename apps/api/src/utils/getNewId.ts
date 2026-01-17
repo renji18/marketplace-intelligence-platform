@@ -1,5 +1,5 @@
 import { uuidv7 } from 'uuidv7';
 
-export function getUuid() {
+export function getNewId() {
   return uuidv7();
 }
