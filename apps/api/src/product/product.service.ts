@@ -184,4 +184,54 @@ export class ProductService {
       products,
     };
   }
+
+  async getSingleProducts(productId: string) {
+    const product = await prisma.product.findUnique({
+      where: { isDeleted: false, id: productId },
+      select: {
+        id: true,
+        name: true,
+        description: true,
+        totalViews: true,
+        totalCarts: true,
+        productCategory: {
+          select: {
+            id: true,
+            name: true,
+          },
+        },
+        productImages: {
+          orderBy: { createdAt: 'asc' },
+          select: {
+            id: true,
+            image: true,
+          },
+        },
+        productPrices: {
+          orderBy: { createdAt: 'desc' },
+          select: {
+            id: true,
+            price: true,
+            reason: true,
+          },
+        },
+      },
+    });
+
+    if (!product) {
+      throw new NotFoundException('Product not found');
+    }
+
+    await prisma.product.update({
+      where: { id: productId },
+      data: {
+        totalViews: { increment: 1 },
+      },
+    });
+
+    return {
+      message: 'Products fetched successfully',
+      product,
+    };
+  }
 }

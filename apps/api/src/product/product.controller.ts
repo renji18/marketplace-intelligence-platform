@@ -53,4 +53,10 @@ export class ProductController {
   getAllProducts() {
     return this.productService.getAllProducts();
   }
+
+  @Public()
+  @Get(':productId')
+  getSingleProducts(@Param('productId') productId: string) {
+    return this.productService.getSingleProducts(productId);
+  }
 }

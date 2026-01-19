@@ -103,6 +103,8 @@ model Product {
   name        String
   description String?
   isDeleted   Boolean @default(false)
+  totalViews  Int     @default(0)
+  totalCarts  Int     @default(0)
 
   company           Company         @relation(fields: [companyId], references: [id], onDelete: Cascade)
   companyId         String
