@@ -24,7 +24,12 @@ export class ProductDto {
 
   @IsOptional()
   @IsNumber()
-  price?: string;
+  price?: number;
+
+  @IsNotEmpty()
+  @IsInt()
+  @Min(0)
+  quantity?: number;
 
   @IsOptional()
   @IsString()

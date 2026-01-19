@@ -58,6 +58,13 @@ export class OrderService {
         })),
       });
 
+      await tx.product.updateMany({
+        where: { id: { in: cart.cartItems.map((c) => c.productId) } },
+        data: {
+          totalOrders: { increment: 1 },
+        },
+      });
+
       await tx.cart.delete({ where: { id: cart.id } });
       await tx.cart.create({ data: { buyerId, id: cart.id } });
     });

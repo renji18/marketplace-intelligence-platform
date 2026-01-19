@@ -17,6 +17,7 @@ export class CartService {
       where: { id: productId, isDeleted: false },
       select: {
         id: true,
+        totalQuantity: true,
         productPrices: {
           take: 1,
           orderBy: { createdAt: 'desc' },
@@ -29,6 +30,10 @@ export class CartService {
 
     if (!product) {
       throw new NotFoundException('Product not found');
+    }
+
+    if (product.totalQuantity === 0) {
+      throw new BadRequestException('Cannot add. Item out of stock');
     }
 
     await prisma.$transaction(async (tx) => {
@@ -68,6 +73,7 @@ export class CartService {
         where: { id: productId },
         data: {
           totalCarts: { increment: 1 },
+          totalQuantity: { decrement: 1 },
         },
       });
     });
@@ -103,18 +109,27 @@ export class CartService {
       throw new BadRequestException('Not enough quantity in cart');
     }
 
-    if (itemInCart.quantity === quantity) {
-      await prisma.cartItem.delete({ where: { id: itemInCart.id } });
-    } else {
-      await prisma.cartItem.update({
-        where: {
-          id: itemInCart.id,
-        },
+    await prisma.$transaction(async (tx) => {
+      await prisma.product.update({
+        where: { id: productId },
         data: {
-          quantity: { decrement: 1 },
+          totalQuantity: { increment: quantity },
         },
       });
-    }
+
+      if (itemInCart.quantity === quantity) {
+        await tx.cartItem.delete({ where: { id: itemInCart.id } });
+      } else {
+        await tx.cartItem.update({
+          where: {
+            id: itemInCart.id,
+          },
+          data: {
+            quantity: { decrement: 1 },
+          },
+        });
+      }
+    });
 
     return {
       message: 'Item removed from cart',

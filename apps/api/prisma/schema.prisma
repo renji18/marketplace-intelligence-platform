@@ -108,13 +108,14 @@ model Company {
 }
 
 model Product {
-  id          String  @id @default(uuid(7))
-  name        String
-  description String?
-  isDeleted   Boolean @default(false)
-  totalViews  Int     @default(0)
-  totalCarts  Int     @default(0)
-  totalOrders Int     @default(0)
+  id            String  @id @default(uuid(7))
+  name          String
+  description   String?
+  isDeleted     Boolean @default(false)
+  totalQuantity Int     @default(0)
+  totalViews    Int     @default(0)
+  totalCarts    Int     @default(0)
+  totalOrders   Int     @default(0)
 
   company           Company         @relation(fields: [companyId], references: [id], onDelete: Cascade)
   companyId         String
@@ -148,7 +149,7 @@ model ProductImage {
   id    String @id @default(uuid(7))
   image String
 
-  product   Product @relation(fields: [productId], references: [id])
+  product   Product @relation(fields: [productId], references: [id], onDelete: Cascade)
   productId String
 
   createdAt DateTime @default(now())

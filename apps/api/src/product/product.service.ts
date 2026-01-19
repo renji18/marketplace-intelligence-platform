@@ -13,8 +13,10 @@ export class ProductService {
         id: true,
         name: true,
         description: true,
+        totalQuantity: true,
         totalViews: true,
         totalCarts: true,
+        totalOrders: true,
         productPrices: {
           orderBy: { createdAt: 'desc' },
           select: {
@@ -55,7 +57,6 @@ export class ProductService {
       throw new NotFoundException('Company not found');
     }
 
-    // category id
     let category = await prisma.productCategory.findUnique({
       where: { name: body.category },
       select: { id: true },
@@ -71,7 +72,6 @@ export class ProductService {
         });
       }
 
-      // product
       const product = await tx.product.upsert({
         where: {
           id: body.id ?? getNewId(),
@@ -80,12 +80,14 @@ export class ProductService {
           name: body.name,
           description: body.description,
           productCategoryId: category.id,
+          totalQuantity: body.quantity,
         },
         create: {
           name: body.name,
           description: body.description,
           productCategoryId: category.id,
           companyId: company.id,
+          totalQuantity: body.quantity,
         },
         select: { id: true },
       });
@@ -157,6 +159,7 @@ export class ProductService {
         id: true,
         name: true,
         description: true,
+        totalQuantity: true,
         productCategory: {
           select: {
             id: true,
@@ -194,8 +197,7 @@ export class ProductService {
         id: true,
         name: true,
         description: true,
-        totalViews: true,
-        totalCarts: true,
+        totalQuantity: true,
         productCategory: {
           select: {
             id: true,
