@@ -15,6 +15,20 @@ export class CartController {
   }
 
   @Buyer()
+  @Get('remove/:productId/:quantity')
+  removeFromCart(
+    @Req() req: Request,
+    @Param('productId') productId: string,
+    @Param('quantity') quantity: string,
+  ) {
+    return this.cartService.removeFromCart(
+      getPayload(req).roleId,
+      productId,
+      Number(quantity),
+    );
+  }
+
+  @Buyer()
   @Get('get')
   getMyCart(@Req() req: Request) {
     return this.cartService.getMyCart(getPayload(req).roleId);
