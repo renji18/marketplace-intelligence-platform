@@ -13,6 +13,8 @@ export class ProductService {
         id: true,
         name: true,
         description: true,
+        totalViews: true,
+        totalCarts: true,
         productPrices: {
           orderBy: { createdAt: 'desc' },
           select: {

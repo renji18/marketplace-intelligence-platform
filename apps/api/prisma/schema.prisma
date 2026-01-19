@@ -59,9 +59,11 @@ model Seller {
 model Buyer {
   id String @id @default(uuid(7))
 
-  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
-  userId String
-  cart   Cart?
+  user      User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  userId    String
+  cart      Cart?
+  orders    Order[]
+  addresses Address[]
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -113,11 +115,12 @@ model Product {
   productImages     ProductImage[]
   productCategory   ProductCategory @relation(fields: [productCategoryId], references: [id], onDelete: Cascade)
   productCategoryId String
+  cartItems         CartItem[]
+  orderItems        OrderItem[]
 
-  createdAt DateTime   @default(now())
-  updatedAt DateTime   @updatedAt
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
   deletedAt DateTime?
-  cartItems CartItem[]
 
   @@unique([name, companyId])
 }
@@ -164,6 +167,8 @@ model Cart {
   buyerId   String
   cartItems CartItem[]
 
+  createdAt DateTime @default(now())
+
   @@unique([buyerId])
 }
 
@@ -178,4 +183,41 @@ model CartItem {
   productId String
 
   @@unique([cartId, productId])
+}
+
+model Address {
+  id          String @id @default(uuid(7))
+  addressLine String
+  city        String
+  state       String
+  country     String
+  pincode     String
+
+  buyer   Buyer   @relation(fields: [buyerId], references: [id], onDelete: Cascade)
+  buyerId String
+  orders  Order[]
+}
+
+model Order {
+  id         String  @id @default(uuid(7))
+  totalPrice Decimal @default(0.00) @db.Decimal(10, 2)
+
+  buyer      Buyer       @relation(fields: [buyerId], references: [id], onDelete: Cascade)
+  buyerId    String
+  address    Address     @relation(fields: [addressId], references: [id], onDelete: Cascade)
+  addressId  String
+  orderItems OrderItem[]
+
+  createdAt DateTime @default(now())
+}
+
+model OrderItem {
+  id       String  @id @default(uuid(7))
+  quantity Int
+  price    Decimal @default(0.00) @db.Decimal(10, 2)
+
+  order     Order   @relation(fields: [orderId], references: [id], onDelete: Cascade)
+  orderId   String
+  product   Product @relation(fields: [productId], references: [id], onDelete: Restrict)
+  productId String
 }

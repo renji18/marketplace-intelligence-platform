@@ -10,6 +10,8 @@ import { ConfigModule } from '@nestjs/config';
 import envConfig from './config/env-manager.service';
 import { GlobalModule } from './config/global.module';
 import { CartModule } from './cart/cart.module';
+import { OrderModule } from './order/order.module';
+import { AddressModule } from './address/address.module';
 
 @Module({
   imports: [
@@ -24,6 +26,8 @@ import { CartModule } from './cart/cart.module';
     ProductModule,
     UserModule,
     CartModule,
+    OrderModule,
+    AddressModule,
   ],
   controllers: [AppController],
   providers: [AppService],
