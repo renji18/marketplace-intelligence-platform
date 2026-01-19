@@ -4,9 +4,9 @@ import { prisma } from 'src/db/db';
 
 @Injectable()
 export class UserService {
-  getUser = async (payload: PayloadInterface) => {
+  async getUser(payload: PayloadInterface) {
     const user = await prisma.user.findUnique({
-      where: { id: payload.userId },
+      where: { id: payload.userId, auth: { isDeleted: false } },
       select: {
         id: true,
         firstName: true,
@@ -14,18 +14,13 @@ export class UserService {
         email: true,
         isActive: true,
         phoneNumber: true,
-        auth: {
-          select: {
-            isDeleted: true,
-          },
-        },
         admin: { select: { id: true } },
         seller: { select: { id: true } },
         buyer: { select: { id: true } },
       },
     });
 
-    if (!user || user?.auth?.isDeleted) {
+    if (!user) {
       throw new NotFoundException('User not found');
     }
 
@@ -34,5 +29,5 @@ export class UserService {
     if (!user.buyer) delete user.buyer;
 
     return { message: 'User fetched successfully', user };
-  };
+  }
 }

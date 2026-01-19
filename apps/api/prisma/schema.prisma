@@ -7,11 +7,17 @@ datasource db {
   provider = "postgresql"
 }
 
+enum OrderStatus {
+  PLACED
+  CANCELLED
+  DELIVERED
+}
+
 model User {
   id          String  @id @default(uuid(7))
   firstName   String
   lastName    String
-  email       String  @unique
+  email       String
   phoneNumber String?
   isActive    Boolean @default(true)
 
@@ -22,6 +28,8 @@ model User {
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
+
+  @@unique([email])
 }
 
 model Auth {
@@ -32,42 +40,53 @@ model Auth {
   isDeleted     Boolean   @default(false)
 
   user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
-  userId String @unique
+  userId String
 
   createdAt DateTime  @default(now())
   updatedAt DateTime  @updatedAt
   deletedAt DateTime?
+
+  @@unique([userId])
 }
 
 model Seller {
   id String @id @default(uuid(7))
 
-  user      User      @relation(fields: [userId], references: [id], onDelete: Cascade)
-  userId    String    @unique
-  companies Company[]
+  user    User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  userId  String
+  company Company?
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
+
+  @@unique([userId])
 }
 
 model Buyer {
   id String @id @default(uuid(7))
 
-  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
-  userId String @unique
+  user      User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  userId    String
+  cart      Cart?
+  orders    Order[]
+  addresses Address[]
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
+
+  @@unique([userId])
 }
 
 model Admin {
   id String @id @default(uuid(7))
 
   user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
-  userId String @unique
+  userId String
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
+
+  @@unique([userId])
 }
 
 model Company {
@@ -81,16 +100,22 @@ model Company {
   ownerId  String
   products Product[]
 
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-  deletedAt DateTime
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+  deletedAt DateTime?
+
+  @@unique([ownerId])
 }
 
 model Product {
-  id          String  @id @default(uuid(7))
-  name        String
-  description String?
-  isDeleted   Boolean @default(false)
+  id            String  @id @default(uuid(7))
+  name          String
+  description   String?
+  isDeleted     Boolean @default(false)
+  totalQuantity Int     @default(0)
+  totalViews    Int     @default(0)
+  totalCarts    Int     @default(0)
+  totalOrders   Int     @default(0)
 
   company           Company         @relation(fields: [companyId], references: [id], onDelete: Cascade)
   companyId         String
@@ -98,10 +123,12 @@ model Product {
   productImages     ProductImage[]
   productCategory   ProductCategory @relation(fields: [productCategoryId], references: [id], onDelete: Cascade)
   productCategoryId String
+  cartItems         CartItem[]
+  orderItems        OrderItem[]
 
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-  deletedAt DateTime
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+  deletedAt DateTime?
 
   @@unique([name, companyId])
 }
@@ -122,7 +149,7 @@ model ProductImage {
   id    String @id @default(uuid(7))
   image String
 
-  product   Product @relation(fields: [productId], references: [id])
+  product   Product @relation(fields: [productId], references: [id], onDelete: Cascade)
   productId String
 
   createdAt DateTime @default(now())
@@ -130,11 +157,76 @@ model ProductImage {
 }
 
 model ProductCategory {
-  id       String @id @default(uuid(7))
-  category String
+  id   String @id @default(uuid(7))
+  name String
 
   products Product[]
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
+
+  @@unique([name])
+}
+
+model Cart {
+  id String @id @default(uuid(7))
+
+  buyer     Buyer      @relation(fields: [buyerId], references: [id], onDelete: Cascade)
+  buyerId   String
+  cartItems CartItem[]
+
+  createdAt DateTime @default(now())
+
+  @@unique([buyerId])
+}
+
+model CartItem {
+  id       String  @id @default(uuid(7))
+  quantity Int
+  price    Decimal @default(0.00) @db.Decimal(10, 2)
+
+  cart      Cart    @relation(fields: [cartId], references: [id], onDelete: Cascade)
+  cartId    String
+  product   Product @relation(fields: [productId], references: [id], onDelete: Cascade)
+  productId String
+
+  @@unique([cartId, productId])
+}
+
+model Address {
+  id          String @id @default(uuid(7))
+  addressLine String
+  city        String
+  state       String
+  country     String
+  pincode     String
+
+  buyer   Buyer   @relation(fields: [buyerId], references: [id], onDelete: Cascade)
+  buyerId String
+  orders  Order[]
+}
+
+model Order {
+  id         String      @id @default(uuid(7))
+  totalPrice Decimal     @default(0.00) @db.Decimal(10, 2)
+  status     OrderStatus @default(PLACED)
+
+  buyer      Buyer       @relation(fields: [buyerId], references: [id], onDelete: Cascade)
+  buyerId    String
+  address    Address     @relation(fields: [addressId], references: [id], onDelete: Cascade)
+  addressId  String
+  orderItems OrderItem[]
+
+  createdAt DateTime @default(now())
+}
+
+model OrderItem {
+  id       String  @id @default(uuid(7))
+  quantity Int
+  price    Decimal @default(0.00) @db.Decimal(10, 2)
+
+  order     Order   @relation(fields: [orderId], references: [id], onDelete: Cascade)
+  orderId   String
+  product   Product @relation(fields: [productId], references: [id], onDelete: Restrict)
+  productId String
 }

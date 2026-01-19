@@ -21,7 +21,7 @@ export class AuthService {
     private readonly envService: EnvConfigService,
   ) {}
 
-  register = async (body: RegisterDto) => {
+  async register(body: RegisterDto) {
     const user = await prisma.user.findUnique({
       where: { email: body.email },
       select: { id: true },
@@ -62,23 +62,23 @@ export class AuthService {
     return {
       message: `${body.role === Roles.buyer ? 'Buyer' : 'Seller'} registered successfully`,
     };
-  };
+  }
 
-  login = async (body: LoginDto) => {
+  async login(body: LoginDto) {
     return prisma.$transaction(async (tx) => {
       const user = await tx.user.findUnique({
-        where: { email: body.email },
+        where: { email: body.email, auth: { isDeleted: false } },
         select: {
           id: true,
           email: true,
-          auth: { select: { isDeleted: true, id: true, password: true } },
+          auth: { select: { id: true, password: true } },
           seller: { select: { id: true } },
           buyer: { select: { id: true } },
           admin: { select: { id: true } },
         },
       });
 
-      if (!user || user?.auth?.isDeleted) {
+      if (!user) {
         throw new NotFoundException('User not found');
       }
 
@@ -103,22 +103,23 @@ export class AuthService {
         },
       });
 
-      const role: ALLOWED_ROLES | 'NA' = user?.admin?.id
-        ? ALLOWED_ROLES.ADMIN
+      const role: { name: ALLOWED_ROLES | 'NA'; id: string } = user?.admin?.id
+        ? { name: ALLOWED_ROLES.ADMIN, id: user?.admin?.id }
         : user?.seller?.id
-          ? ALLOWED_ROLES.SELLER
+          ? { name: ALLOWED_ROLES.SELLER, id: user?.seller?.id }
           : user?.buyer?.id
-            ? ALLOWED_ROLES.BUYER
-            : 'NA';
+            ? { name: ALLOWED_ROLES.BUYER, id: user?.buyer?.id }
+            : { name: 'NA', id: 'NA' };
 
-      if (role === 'NA') {
+      if (role.name === 'NA') {
         throw new NotFoundException('Unknown user');
       }
 
       const payload: PayloadInterface = {
         email: user.email,
         userId: user.id,
-        role,
+        roleName: role.name,
+        roleId: role.id,
         verified: false,
       };
 
@@ -126,18 +127,17 @@ export class AuthService {
 
       return tokens;
     });
-  };
+  }
 
-  verifyOtp = async (payload: PayloadInterface, otp: string) => {
+  async verifyOtp(payload: PayloadInterface, otp: string) {
     return prisma.$transaction(async (tx) => {
       const user = await tx.user.findUnique({
-        where: { id: payload.userId },
+        where: { id: payload.userId, auth: { isDeleted: false } },
         select: {
           id: true,
           auth: {
             select: {
               id: true,
-              isDeleted: true,
               otp: true,
               otpValidUntil: true,
             },
@@ -145,7 +145,7 @@ export class AuthService {
         },
       });
 
-      if (!user || user?.auth?.isDeleted) {
+      if (!user) {
         throw new NotFoundException('User not found');
       }
 
@@ -170,7 +170,8 @@ export class AuthService {
       const newPayload: PayloadInterface = {
         email: payload.email,
         userId: payload.userId,
-        role: payload.role,
+        roleName: payload.roleName,
+        roleId: payload.roleId,
         verified: true,
       };
 
@@ -178,9 +179,9 @@ export class AuthService {
 
       return tokens;
     });
-  };
+  }
 
-  refreshToken = async (token: string) => {
+  async refreshToken(token: string) {
     const payload: PayloadInterface = await this.jwtService.verifyAsync(token, {
       secret: this.envService.refreshTokenOptions.secret,
     });
@@ -190,11 +191,11 @@ export class AuthService {
     }
 
     const user = await prisma.user.findUnique({
-      where: { id: payload.userId },
-      select: { id: true, auth: { select: { isDeleted: true } } },
+      where: { id: payload.userId, auth: { isDeleted: false } },
+      select: { id: true },
     });
 
-    if (!user || user?.auth?.isDeleted) {
+    if (!user) {
       throw new NotFoundException('User not found');
     }
 
@@ -207,11 +208,11 @@ export class AuthService {
     });
 
     return accessToken;
-  };
+  }
 
   // ============================= PRIVATE METHODS =============================
 
-  private _generateTokens = async (payload: PayloadInterface) => {
+  private async _generateTokens(payload: PayloadInterface) {
     return {
       access_token: await this.jwtService.signAsync(payload, {
         secret: this.envService.accessTokenOptions.secret,
@@ -222,5 +223,5 @@ export class AuthService {
         expiresIn: this.envService.refreshTokenOptions.expiresIn,
       }),
     };
-  };
+  }
 }
