@@ -1,1 +1,24 @@
 @import "tailwindcss";
+
+@theme {
+  /* OCEAN GREEN */
+  --color-primary-1: #4ea674;
+  /* CYPRUS */
+  --color-secondary-1: #023337;
+  /* SURF CREST */
+  --color-secondary-2: #c1e6ba;
+  /* AQUA SPRING */
+  --color-accent: #eaf8e7;
+  /* PRIMARY */
+  --color-primary-2: #6467f2;
+  /* SUCCESS */
+  --color-success: #21c45d;
+  /* PENDING */
+  --color-pending: #f0d411;
+  /* ERROR */
+  --color-error: #ef4343;
+  /* GRAY */
+  --color-gray: #7c7c7c;
+
+  --font-lato: "Lato", system-ui, sans-serif;
+}
