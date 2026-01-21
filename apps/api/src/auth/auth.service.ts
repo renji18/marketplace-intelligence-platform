@@ -150,13 +150,13 @@ export class AuthService {
       }
 
       if (!user?.auth?.otpValidUntil || new Date() > user.auth.otpValidUntil) {
-        return false;
+        return { tokens: null, roleName: null };
       }
 
       const validOtp = await verifyPassword(otp, user.auth.otp);
 
       if (!validOtp) {
-        return false;
+        return { tokens: null, roleName: null };
       }
 
       await tx.auth.update({
@@ -177,7 +177,7 @@ export class AuthService {
 
       const tokens = await this._generateTokens(newPayload);
 
-      return tokens;
+      return { tokens, roleName: payload.roleName };
     });
   }
 

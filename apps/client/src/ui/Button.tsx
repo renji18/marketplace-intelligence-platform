@@ -3,23 +3,32 @@ const Button = ({
   variant,
   customCss,
   fn,
+  disabled,
 }: {
   text: string;
   variant: "primary-light" | "primary-dark" | "secondary" | "accent" | "custom";
   customCss?: string;
   fn?: () => void;
+  disabled: boolean;
 }) => {
-  const primaryLight = `bg-primary-1 text-white py-[11.5px] px-[50.5px] rounded-[200px] font-bold ${customCss}`;
+  const baseCss = `transition-all duration-200 ease-in-out rounded-[200px] ${disabled ? "cursor-not-allowed" : "cursor-pointer"}`;
 
-  const primaryDark = `bg-secondary-1 text-white py-[14.5px] px-[38.5px] rounded-[200px] font-bold ${customCss}`;
+  const primaryLight = `bg-primary-1 text-white py-[11.5px] px-[50.5px] font-bold ${baseCss} ${customCss}`;
 
-  const secondary = `bg-accent text-secondary-1 py-[11.5px] px-[53.5px] rounded-[200px] font-bold ${customCss}`;
+  const primaryDark = `bg-secondary-1 text-white py-[14.5px] px-[38.5px] font-bold ${baseCss} ${customCss}`;
 
-  const accent = `bg-white border border-black text-black py-[11.5px] px-[61.5px] rounded-[200px] ${customCss}`;
+  const secondary = `bg-accent text-secondary-1 py-[11.5px] px-[53.5px] font-bold ${baseCss} ${customCss}`;
+
+  const accent = `bg-white border border-black text-black py-[11.5px] px-[61.5px] ${baseCss} ${customCss}`;
 
   return (
-    <div
-      onClick={() => fn?.()}
+    <button
+      disabled={disabled}
+      onClick={() => {
+        if (!disabled) {
+          fn?.();
+        }
+      }}
       className={
         variant === "primary-light"
           ? primaryLight
@@ -33,7 +42,7 @@ const Button = ({
       }
     >
       <p>{text}</p>
-    </div>
+    </button>
   );
 };
 

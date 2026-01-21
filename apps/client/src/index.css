@@ -1,15 +1,15 @@
 @import "tailwindcss";
 
 @theme {
-  /* OCEAN GREEN */
+  /* GREEN */
   --color-primary-1: #4ea674;
-  /* CYPRUS */
+  /* DARK GREEN */
   --color-secondary-1: #023337;
-  /* SURF CREST */
+  /* LIGHT GREEN */
   --color-secondary-2: #c1e6ba;
-  /* AQUA SPRING */
+  /* VERY LIGHT GREEN */
   --color-accent: #eaf8e7;
-  /* PRIMARY */
+  /* VIOLET */
   --color-primary-2: #6467f2;
   /* SUCCESS */
   --color-success: #21c45d;

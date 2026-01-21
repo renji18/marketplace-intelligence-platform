@@ -77,7 +77,10 @@ export class AuthController {
     @Body() body: { otp: string },
     @Res() res: Response,
   ) {
-    const tokens = await this.authService.verifyOtp(req['user'], body.otp);
+    const { roleName, tokens } = await this.authService.verifyOtp(
+      req['user'],
+      body.otp,
+    );
 
     if (tokens) {
       res
@@ -92,7 +95,7 @@ export class AuthController {
           this.getCookieOptions(),
         )
         .status(200)
-        .json({ message: 'Logged in successfully' });
+        .json({ message: 'Logged in successfully', roleName });
     } else {
       res
         .clearCookie(this.cookies.access_cookie, this.getCookieOptions())

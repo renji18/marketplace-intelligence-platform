@@ -1,4 +1,4 @@
-import { Route, Routes } from "react-router-dom";
+import { Route, Routes, useNavigate } from "react-router-dom";
 import Seller from "./pages/seller";
 import Admin from "./pages/admin";
 import Buyer from "./pages/buyer";
@@ -11,10 +11,11 @@ import { getUser } from "./redux/slice/auth/asyncFn";
 
 const App = () => {
   const dispatch = useDispatch<MyDispatch>();
+  const navigate = useNavigate();
 
   useEffect(() => {
-    dispatch(getUser());
-  }, [dispatch]);
+    dispatch(getUser(navigate));
+  }, [dispatch, navigate]);
 
   return (
     <>
