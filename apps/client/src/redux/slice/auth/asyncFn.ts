@@ -90,3 +90,20 @@ export const getUser = createAsyncThunk(
     }
   },
 );
+
+//Log out User
+export const logOut = createAsyncThunk(
+  "logOut",
+  async (navigate: NavigateFunction, { rejectWithValue }) => {
+    try {
+      const res = await apiClient.get(authUrls.logout);
+
+      return { body: res.data, status: res.status, navigate };
+    } catch (error) {
+      if (error instanceof AxiosError && error?.response) {
+        return rejectWithValue(error?.response?.data["error"]);
+      }
+      return rejectWithValue("An unexpected error occurred.");
+    }
+  },
+);

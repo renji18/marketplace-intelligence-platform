@@ -10,24 +10,23 @@ import { useNavigate } from "react-router-dom";
 const SignIn = () => {
   const dispatch = useDispatch<MyDispatch>();
   const navigate = useNavigate();
-
   const { loading } = MySelector((state) => state.auth);
 
-  const [authData, setAuthData] = useState<{ email: string; password: string }>(
-    { email: "", password: "" },
-  );
+  const [authData, setAuthData] = useState({ email: "", password: "" });
 
   return (
     <AuthLayout>
-      <div className="w-[50%] pr-20 flex flex-col items-center">
-        <p className="text-3xl text-secondary-1 font-bold">
-          Log in to your Account
-        </p>
-        <p className="text-gray mt-0.5">
-          See what is going on with your business
-        </p>
+      <div className="flex flex-col gap-6">
+        {/* Header */}
+        <div className="text-center">
+          <h1 className="text-3xl font-bold text-secondary-1">Welcome back</h1>
+          <p className="text-gray mt-1 text-sm">
+            Sign in to manage your marketplace
+          </p>
+        </div>
 
-        <div className="w-full mt-8 mb-2 space-y-6">
+        {/* Form */}
+        <div className="space-y-5">
           <AuthInput
             id="email"
             label="Email"
@@ -42,7 +41,7 @@ const SignIn = () => {
           <AuthInput
             id="password"
             label="Password"
-            placeholder="**************"
+            placeholder="••••••••"
             value={authData.password}
             inputType="password"
             setData={(value) =>
@@ -51,24 +50,26 @@ const SignIn = () => {
           />
         </div>
 
-        <div className="w-full">
-          <p className="text-end text-sm font-light text-secondary-1 cursor-pointer">
+        {/* Actions */}
+        <div className="flex justify-end">
+          <button className="text-sm text-secondary-1 hover:underline">
             Forgot password?
-          </p>
+          </button>
         </div>
 
         <Button
-          text="Log In"
-          variant="primary-light"
-          customCss="w-full text-center tracking-wide mt-6 mb-2 hover:bg-secondary-1"
-          fn={() => {
-            dispatch(loginUser({ ...authData, navigate }));
-          }}
+          text="Log in"
+          variant="primary"
+          className="w-full tracking-wide hover:bg-secondary-1"
+          onClick={() => dispatch(loginUser({ ...authData, navigate }))}
           disabled={loading || !authData.email || !authData.password}
         />
 
-        <p className="text-secondary-1 text-sm font-light cursor-pointer">
-          Create account instead?
+        <p className="text-center text-sm text-secondary-1">
+          Don&apos;t have an account?{" "}
+          <span className="font-medium cursor-pointer hover:underline">
+            Create one
+          </span>
         </p>
       </div>
     </AuthLayout>

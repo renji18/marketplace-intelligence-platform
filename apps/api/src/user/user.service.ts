@@ -14,8 +14,22 @@ export class UserService {
         email: true,
         isActive: true,
         phoneNumber: true,
+        role: true,
         admin: { select: { id: true } },
-        seller: { select: { id: true } },
+        seller: {
+          select: {
+            id: true,
+            company: {
+              where: { isDeleted: false },
+              select: {
+                id: true,
+                name: true,
+                isVerified: true,
+                createdAt: true,
+              },
+            },
+          },
+        },
         buyer: { select: { id: true } },
       },
     });

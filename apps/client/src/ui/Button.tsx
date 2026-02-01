@@ -1,47 +1,70 @@
+type ButtonVariant = "primary" | "primary-dark" | "secondary" | "accent";
+
+type ButtonSize = "sm" | "md" | "lg";
+
 const Button = ({
   text,
-  variant,
-  customCss,
-  fn,
-  disabled,
+  variant = "primary",
+  size = "md",
+  className = "",
+  onClick,
+  disabled = false,
 }: {
   text: string;
-  variant: "primary-light" | "primary-dark" | "secondary" | "accent" | "custom";
-  customCss?: string;
-  fn?: () => void;
-  disabled: boolean;
+  variant?: ButtonVariant;
+  size?: ButtonSize;
+  className?: string;
+  onClick?: () => void;
+  disabled?: boolean;
 }) => {
-  const baseCss = `transition-all duration-200 ease-in-out rounded-[200px] ${disabled ? "cursor-not-allowed" : "cursor-pointer"}`;
+  const base =
+    "inline-flex items-center justify-center rounded-md font-medium transition-colors focus:outline-none focus:ring-2 focus:ring-offset-2";
 
-  const primaryLight = `bg-primary-1 text-white py-[11.5px] px-[50.5px] font-bold ${baseCss} ${customCss}`;
+  const sizes: Record<ButtonSize, string> = {
+    sm: "px-3 py-1.5 text-sm",
+    md: "px-4 py-2 text-sm",
+    lg: "px-6 py-3 text-base",
+  };
 
-  const primaryDark = `bg-secondary-1 text-white py-[14.5px] px-[38.5px] font-bold ${baseCss} ${customCss}`;
+  const variants: Record<ButtonVariant, string> = {
+    primary: `
+      bg-primary-1 text-white
+      hover:bg-secondary-1
+      focus:ring-secondary-2
+    `,
+    "primary-dark": `
+      bg-secondary-1 text-white
+      hover:bg-primary-1
+      focus:ring-secondary-2
+    `,
+    secondary: `
+      bg-accent text-secondary-1
+      hover:bg-secondary-2
+      focus:ring-secondary-2
+    `,
+    accent: `
+      bg-white border border-gray-300 text-secondary-1
+      hover:bg-accent
+      focus:ring-secondary-2
+    `,
+  };
 
-  const secondary = `bg-accent text-secondary-1 py-[11.5px] px-[53.5px] font-bold ${baseCss} ${customCss}`;
-
-  const accent = `bg-white border border-black text-black py-[11.5px] px-[61.5px] ${baseCss} ${customCss}`;
+  const disabledStyles = "opacity-50 cursor-not-allowed pointer-events-none";
 
   return (
     <button
+      type="button"
       disabled={disabled}
-      onClick={() => {
-        if (!disabled) {
-          fn?.();
-        }
-      }}
-      className={
-        variant === "primary-light"
-          ? primaryLight
-          : variant === "primary-dark"
-            ? primaryDark
-            : variant === "secondary"
-              ? secondary
-              : variant === "accent"
-                ? accent
-                : customCss
-      }
+      onClick={onClick}
+      className={`
+        ${base}
+        ${sizes[size]}
+        ${variants[variant]}
+        ${disabled ? disabledStyles : ""}
+        ${className}
+      `}
     >
-      <p>{text}</p>
+      {text}
     </button>
   );
 };

@@ -1,9 +1,5 @@
 import { IsEnum, IsNotEmpty, IsOptional, IsString } from 'class-validator';
-
-export enum Roles {
-  seller = 'seller',
-  buyer = 'buyer',
-}
+import { Role } from 'prisma/generated/prisma/enums';
 
 export class RegisterDto {
   @IsNotEmpty()
@@ -18,9 +14,9 @@ export class RegisterDto {
   @IsString()
   email: string;
 
-  @IsEnum(Roles)
+  @IsEnum(Role)
   @IsNotEmpty()
-  role: Roles;
+  role: Role;
 
   @IsOptional()
   @IsString()

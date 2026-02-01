@@ -3,7 +3,7 @@ const AuthInput = ({
   label,
   placeholder,
   value,
-  inputType,
+  inputType = "text",
   setData,
 }: {
   id: string;
@@ -14,17 +14,26 @@ const AuthInput = ({
   setData: (arg: string) => void;
 }) => {
   return (
-    <div>
-      <label className="text-gray" htmlFor={id}>
+    <div className="flex flex-col gap-1">
+      <label htmlFor={id} className="text-sm font-medium text-secondary-1">
         {label}
       </label>
       <input
-        type={inputType ?? "text"}
         id={id}
+        type={inputType}
         placeholder={placeholder}
         value={value}
-        className="w-full border mt-1 p-3 placeholder:text-gray-300 rounded-md border-gray-300 outline-gray-600 text-sm"
         onChange={(e) => setData(e.target.value)}
+        className="
+          w-full rounded-md
+          border border-gray-300
+          px-3 py-2.5
+          text-sm
+          placeholder:text-gray-400
+          focus:border-secondary-1
+          focus:ring-2 focus:ring-secondary-2
+          outline-none
+        "
       />
     </div>
   );

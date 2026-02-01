@@ -13,12 +13,19 @@ enum OrderStatus {
   DELIVERED
 }
 
+enum Role {
+  SELLER
+  BUYER
+  ADMIN
+}
+
 model User {
   id          String  @id @default(uuid(7))
   firstName   String
   lastName    String
   email       String
   phoneNumber String?
+  role        Role
   isActive    Boolean @default(true)
 
   auth   Auth?
@@ -93,7 +100,6 @@ model Company {
   id         String  @id @default(uuid(7))
   name       String
   isVerified Boolean @default(false)
-  isPrimary  Boolean @default(false)
   isDeleted  Boolean @default(false)
 
   owner    Seller    @relation(fields: [ownerId], references: [id], onDelete: Cascade)

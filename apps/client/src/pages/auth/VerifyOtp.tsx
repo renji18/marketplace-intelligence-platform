@@ -86,15 +86,22 @@ const VerifyOtp = () => {
 
   return (
     <AuthLayout>
-      <div className="w-[50%] pr-20 flex flex-col items-center">
-        <p className="text-3xl text-secondary-1 font-bold">OTP Verification</p>
-        <p className="text-gray mt-0.5">Enter the OTP sent to your email</p>
+      <div className="flex flex-col gap-6">
+        <div className="text-center">
+          <h1 className="text-3xl font-bold text-secondary-1">
+            OTP Verification
+          </h1>
+          <p className="text-gray text-sm mt-1">
+            Enter the 6-digit code sent to your email
+          </p>
+        </div>
 
-        <div className="gap-3 lg:gap-2.5 flex items-center justify-center w-full mt-8">
+        <div className="flex justify-center gap-2 sm:gap-3">
           {otp.map((_, indx) => (
             <input
               ref={indx === activeOtpIndex ? inputRef : null}
-              type={"password"}
+              type="text"
+              inputMode="numeric"
               key={indx}
               onChange={handleChange}
               value={otp[indx]}
@@ -104,21 +111,29 @@ const VerifyOtp = () => {
                 if (e.key === "Backspace")
                   setActiveOtpIndex(currentOTPIndex - 1);
               }}
-              className={`text-[#1F1F1F] rounded-lg border border-secondary-1 active:border-none active:outline-1 outline-secondary-2 font-normal h-11 w-12 text-center caret-transparent pb-2 text-2xl`}
+              className="
+          h-12 w-12 sm:h-14 sm:w-14
+          text-xl text-center
+          rounded-md
+          border border-gray-300
+          focus:border-secondary-1
+          focus:ring-2 focus:ring-secondary-2
+          outline-none
+        "
             />
           ))}
         </div>
 
         <Button
           text="Verify"
-          variant="primary-light"
-          customCss="w-full text-center tracking-wide mt-6 mb-2 hover:bg-secondary-1"
-          fn={handleVerify}
+          variant="primary"
+          className="w-full tracking-wide hover:bg-secondary-1"
+          onClick={handleVerify}
           disabled={!isOtpComplete || loading}
         />
 
-        <p className="text-secondary-1 text-sm font-light cursor-pointer">
-          Create account instead?
+        <p className="text-center text-sm text-secondary-1 cursor-pointer hover:underline">
+          Didn&apos;t receive the code?
         </p>
       </div>
     </AuthLayout>

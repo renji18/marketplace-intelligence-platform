@@ -5,17 +5,18 @@ import {
   UnauthorizedException,
 } from '@nestjs/common';
 import { Reflector } from '@nestjs/core';
-import { ALLOWED_ROLES, ROLES_KEY } from './roles.decorator';
+import { ROLES_KEY } from './roles.decorator';
+import { Role } from 'prisma/generated/prisma/enums';
 
 @Injectable()
 export class RolesGuard implements CanActivate {
   constructor(private reflector: Reflector) {}
 
   canActivate(context: ExecutionContext): boolean {
-    const allowedRoles = this.reflector.getAllAndOverride<ALLOWED_ROLES[]>(
-      ROLES_KEY,
-      [context.getHandler(), context.getClass()],
-    );
+    const allowedRoles = this.reflector.getAllAndOverride<Role[]>(ROLES_KEY, [
+      context.getHandler(),
+      context.getClass(),
+    ]);
 
     if (!allowedRoles || allowedRoles.length === 0) {
       return true;
@@ -29,7 +30,7 @@ export class RolesGuard implements CanActivate {
 
     const userRole = user.roleName;
 
-    if (!Object.values(ALLOWED_ROLES).includes(userRole)) {
+    if (!Object.values(Role).includes(userRole)) {
       throw new UnauthorizedException();
     }
 

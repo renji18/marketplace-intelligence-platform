@@ -14,7 +14,6 @@ export class CompanyService {
         id: true,
         name: true,
         isVerified: true,
-        isPrimary: true,
         createdAt: true,
       },
     });
@@ -62,7 +61,6 @@ export class CompanyService {
         id: true,
         name: true,
         isVerified: true,
-        isPrimary: true,
         isDeleted: true,
         createdAt: true,
         deletedAt: true,

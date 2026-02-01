@@ -124,7 +124,7 @@ export class AuthController {
       });
   }
 
-  @AccessWithoutVerification()
+  @Public()
   @Get('logout')
   async logout(@Res() res: Response) {
     res

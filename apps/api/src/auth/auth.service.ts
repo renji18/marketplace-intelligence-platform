@@ -5,14 +5,14 @@ import {
   InternalServerErrorException,
   NotFoundException,
 } from '@nestjs/common';
-import { RegisterDto, Roles } from './dto/register.dto';
+import { RegisterDto } from './dto/register.dto';
 import { prisma } from 'src/db/db';
 import { generateOTP, hashPassword, verifyPassword } from 'src/utils/password';
 import { LoginDto } from './dto/login.dto';
 import { JwtService } from '@nestjs/jwt';
-import { ALLOWED_ROLES } from './utils/roles.decorator';
 import { PayloadInterface } from '../interface/payload.interface';
 import { EnvConfigService } from 'src/config/env-manager.service';
+import { Role } from 'prisma/generated/prisma/enums';
 
 @Injectable()
 export class AuthService {
@@ -31,6 +31,10 @@ export class AuthService {
       throw new BadRequestException('User with the given email already exists');
     }
 
+    if (body.role === 'ADMIN') {
+      throw new BadRequestException('Cannot register a new Admin');
+    }
+
     const encryptedPassword = await hashPassword(body.password);
 
     const newUser = await prisma.user.create({
@@ -39,12 +43,13 @@ export class AuthService {
         lastName: body.lastName,
         email: body.email,
         phoneNumber: body.phoneNumber,
+        role: body.role,
         auth: {
           create: {
             password: encryptedPassword,
           },
         },
-        ...(body.role === Roles.seller
+        ...(body.role === Role.SELLER
           ? { seller: { create: {} } }
           : { buyer: { create: {} } }),
       },
@@ -60,7 +65,7 @@ export class AuthService {
     }
 
     return {
-      message: `${body.role === Roles.buyer ? 'Buyer' : 'Seller'} registered successfully`,
+      message: `${body.role === Role.BUYER ? 'Buyer' : 'Seller'} registered successfully`,
     };
   }
 
@@ -71,6 +76,7 @@ export class AuthService {
         select: {
           id: true,
           email: true,
+          role: true,
           auth: { select: { id: true, password: true } },
           seller: { select: { id: true } },
           buyer: { select: { id: true } },
@@ -103,23 +109,18 @@ export class AuthService {
         },
       });
 
-      const role: { name: ALLOWED_ROLES | 'NA'; id: string } = user?.admin?.id
-        ? { name: ALLOWED_ROLES.ADMIN, id: user?.admin?.id }
-        : user?.seller?.id
-          ? { name: ALLOWED_ROLES.SELLER, id: user?.seller?.id }
-          : user?.buyer?.id
-            ? { name: ALLOWED_ROLES.BUYER, id: user?.buyer?.id }
-            : { name: 'NA', id: 'NA' };
+      const roleId: string =
+        user?.admin?.id ?? user?.seller?.id ?? user?.seller?.id ?? 'NA';
 
-      if (role.name === 'NA') {
+      if (roleId === 'NA') {
         throw new NotFoundException('Unknown user');
       }
 
       const payload: PayloadInterface = {
         email: user.email,
         userId: user.id,
-        roleName: role.name,
-        roleId: role.id,
+        roleName: user.role,
+        roleId,
         verified: false,
       };
 

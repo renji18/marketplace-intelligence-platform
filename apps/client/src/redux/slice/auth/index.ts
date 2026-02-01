@@ -1,6 +1,6 @@
 import { createSlice } from "@reduxjs/toolkit";
 import { initialState } from "./initialState";
-import { getUser, loginUser, verifyOtp } from "./asyncFn";
+import { getUser, loginUser, logOut, verifyOtp } from "./asyncFn";
 import { toast } from "sonner";
 import type { NavigateFunction } from "react-router-dom";
 import { ADMIN, BUYER, SELLER } from "@/utils/assets";
@@ -62,11 +62,11 @@ const auth = createSlice({
           const role = body?.roleName;
 
           if (role === ADMIN) {
-            navigate("/admin");
+            navigate("/admin/dashboard");
           } else if (role === BUYER) {
-            navigate("/buyer");
+            navigate("/buyer/dashboard");
           } else if (role === SELLER) {
-            navigate("/seller");
+            navigate("/seller/dashboard");
           }
         } else {
           navigate("/login");
@@ -100,20 +100,45 @@ const auth = createSlice({
           state.user = body?.user;
           state.message = body?.message;
           state.error = null;
-          if (body.user?.admin?.id) {
-            navigate("/admin");
-          } else if (body.user?.buyer?.id) {
-            navigate("/buyer");
-          } else if (body.user?.seller?.id) {
-            navigate("/seller");
-          } else {
-            navigate("/login");
+
+          const role = body.user?.role;
+
+          if (role === ADMIN) {
+            navigate("/admin/dashboard");
+          } else if (role === BUYER) {
+            navigate("/buyer/dashboard");
+          } else if (role === SELLER) {
+            navigate("/seller/dashboard");
           }
+        } else {
+          navigate("/login");
+          toast.error("Login Error");
         }
 
         state.loading = false;
       })
       .addCase(getUser.rejected, (state) => {
+        state.loading = false;
+      });
+
+    //Log out User
+    builder
+      .addCase(logOut.pending, (state) => {
+        state.loading = true;
+        state.error = null;
+      })
+      .addCase(logOut.fulfilled, (state, action) => {
+        const { body, status, navigate } = action.payload;
+
+        if (status === 200 || status === 304) {
+          state.user = undefined;
+          state.message = body?.message;
+          navigate("/login");
+        }
+
+        state.loading = false;
+      })
+      .addCase(logOut.rejected, (state) => {
         state.loading = false;
       });
   },

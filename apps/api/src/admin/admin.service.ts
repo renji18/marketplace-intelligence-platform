@@ -29,6 +29,7 @@ export class AdminService {
         firstName: body.firstName,
         lastName: body.lastName,
         email: body.email,
+        role: 'ADMIN',
         auth: {
           create: {
             password: encryptedPassword,

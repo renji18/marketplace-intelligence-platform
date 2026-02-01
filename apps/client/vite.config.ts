@@ -1,7 +1,7 @@
-import { defineConfig } from "vite"
-import react from "@vitejs/plugin-react"
-import * as path from "node:path"
-import tailwindcss from "@tailwindcss/vite"
+import { defineConfig } from "vite";
+import react from "@vitejs/plugin-react";
+import * as path from "node:path";
+import tailwindcss from "@tailwindcss/vite";
 
 // https://vite.dev/config/
 export default defineConfig({
@@ -13,6 +13,7 @@ export default defineConfig({
       "@components": path.resolve(__dirname, "./src/components"),
       "@hooks": path.resolve(__dirname, "./src/hooks"),
       "@interfaces": path.resolve(__dirname, "./src/interfaces"),
+      "@configs": path.resolve(__dirname, "./src/config"),
       "@pages": path.resolve(__dirname, "./src/pages"),
       "@zustand": path.resolve(__dirname, "./src/zustand"),
       "@ui": path.resolve(__dirname, "./src/ui"),
@@ -20,4 +21,4 @@ export default defineConfig({
     },
   },
   plugins: [react(), tailwindcss()],
-})
+});
