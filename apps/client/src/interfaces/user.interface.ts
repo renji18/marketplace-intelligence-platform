@@ -1,4 +1,4 @@
-import type { UserRole } from "@/types/role.type";
+import type { ALLOWED_ROLES } from "@/utils/assets";
 
 export interface UserInterface {
   id: string;
@@ -9,12 +9,6 @@ export interface UserInterface {
   phoneNumber?: string;
   seller?: {
     id: string;
-    company?: {
-      id: string;
-      name: string;
-      isVerified: boolean;
-      createdAt: string;
-    };
   };
   buyer?: {
     id: string;
@@ -22,5 +16,6 @@ export interface UserInterface {
   admin?: {
     id: string;
   };
-  role: UserRole;
+  role: keyof typeof ALLOWED_ROLES;
+  createdAt: string;
 }

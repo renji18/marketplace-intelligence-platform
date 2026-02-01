@@ -12,3 +12,10 @@ export const authUrls = {
   resetPassword: "/auth/reset-password",
   logout: "/auth/logout",
 };
+
+export const companyUrls = {
+  createCompany: "/company/create",
+  getSellerCompany: "/company/my",
+  getAllCompanies: "/company/all",
+  toggleCompanyStatus: "/company/toggle/",
+};

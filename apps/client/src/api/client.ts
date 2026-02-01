@@ -51,9 +51,9 @@ apiClient.interceptors.response.use(
           // the refresh token api call is success then just navigate back to specific dashboard
           if (res.status === 200 && res.data?.user) {
             const user: UserInterface = res.data?.user;
-            if (user.buyer?.id) window.location.replace("/buyer");
-            if (user.seller?.id) window.location.replace("/seller");
-            if (user.admin?.id) window.location.replace("/admin");
+            if (user.buyer?.id) window.location.replace("/buyer/dashboard");
+            if (user.seller?.id) window.location.replace("/seller/dashboard");
+            if (user.admin?.id) window.location.replace("/admin/dashboard");
             // if refresh token api fails show unexpected error
           } else {
             throw new Error("Unexpected error occurred");

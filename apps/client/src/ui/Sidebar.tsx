@@ -1,6 +1,7 @@
 import { NavLink } from "react-router-dom";
 import { NAV_ITEMS } from "@/config/navigation";
 import { MySelector } from "@/redux/store";
+import logo from "@/assets/logo-white.png";
 
 const Sidebar = ({ open, onClose }: { open: boolean; onClose: () => void }) => {
   const { user } = MySelector((state) => state.auth);
@@ -26,8 +27,8 @@ const Sidebar = ({ open, onClose }: { open: boolean; onClose: () => void }) => {
         `}
       >
         {/* Logo */}
-        <div className="h-16 flex items-center px-6 font-bold text-lg">
-          Mipra
+        <div className="h-16 flex items-center px-6 font-bold text-lg justify-center">
+          <img src={logo} alt="logo" className="h-12" />
         </div>
 
         {/* Nav */}

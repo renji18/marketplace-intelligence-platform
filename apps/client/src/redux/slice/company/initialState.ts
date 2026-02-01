@@ -1,10 +1,11 @@
-import type { UserInterface } from "@/interfaces/user.interface";
+import type { CompanyInterface } from "@/interfaces/company.interface";
 
 export const initialState: {
   loading: boolean;
   error: string | null;
   message: string | null;
-  user?: UserInterface;
+  company?: CompanyInterface;
+  companies?: Array<CompanyInterface>;
 } = {
   loading: true,
   error: null,

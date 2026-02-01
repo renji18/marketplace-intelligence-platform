@@ -110,7 +110,7 @@ export class AuthService {
       });
 
       const roleId: string =
-        user?.admin?.id ?? user?.seller?.id ?? user?.seller?.id ?? 'NA';
+        user?.admin?.id ?? user?.seller?.id ?? user?.buyer?.id ?? 'NA';
 
       if (roleId === 'NA') {
         throw new NotFoundException('Unknown user');

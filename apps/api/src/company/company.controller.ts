@@ -1,4 +1,4 @@
-import { Body, Controller, Get, Post, Req } from '@nestjs/common';
+import { Body, Controller, Get, Param, Post, Req } from '@nestjs/common';
 import { CompanyService } from './company.service';
 import { Admin, Seller } from 'src/auth/utils/roles.decorator';
 import { Request } from 'express';
@@ -27,5 +27,11 @@ export class CompanyController {
   @Get('all')
   getAllCompanies() {
     return this.companyService.getAllCompanies();
+  }
+
+  @Admin()
+  @Get('toggle/:companyId')
+  toggleCompanyStatus(@Param('companyId') companyId: string) {
+    return this.companyService.toggleCompanyStatus(companyId);
   }
 }

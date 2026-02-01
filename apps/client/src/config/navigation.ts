@@ -24,20 +24,20 @@ export const NAV_ITEMS: NavItem[] = [
     path: "/seller/dashboard",
     roles: [SELLER],
   },
+  {
+    label: "Companies",
+    path: "/admin/companies",
+    roles: [ADMIN],
+  },
+  {
+    label: "My Company",
+    path: "/seller/company",
+    roles: [SELLER],
+  },
   // {
-  //   label: "Companies",
-  //   path: "/admin/companies",
-  //   roles: ["admin"],
-  // },
-  // {
-  //   label: "My Company",
-  //   path: "/seller/company",
-  //   roles: ["seller"],
-  // },
-  // {
-  //   label: "Products",
+  //   label: "My Products",
   //   path: "/seller/products",
-  //   roles: ["seller"],
+  //   roles: [SELLER],
   // },
   // {
   //   label: "Orders",

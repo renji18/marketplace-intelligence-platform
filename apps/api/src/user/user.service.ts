@@ -15,6 +15,7 @@ export class UserService {
         isActive: true,
         phoneNumber: true,
         role: true,
+        createdAt: true,
         admin: { select: { id: true } },
         seller: {
           select: {

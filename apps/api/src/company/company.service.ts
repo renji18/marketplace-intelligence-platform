@@ -85,4 +85,28 @@ export class CompanyService {
       companies,
     };
   }
+
+  async toggleCompanyStatus(compnayId: string) {
+    const company = await prisma.company.findUnique({
+      where: { id: compnayId },
+      select: {
+        isVerified: true,
+      },
+    });
+
+    if (!company) {
+      throw new NotFoundException('Company not found');
+    }
+
+    await prisma.company.update({
+      where: { id: compnayId },
+      data: {
+        isVerified: !company.isVerified,
+      },
+    });
+
+    return {
+      message: 'Company status toggled successfully',
+    };
+  }
 }

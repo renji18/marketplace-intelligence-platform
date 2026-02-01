@@ -16,11 +16,7 @@ const Navbar = ({ onMenuClick }: { onMenuClick: () => void }) => {
 
       <div className="flex-1 font-medium text-secondary-1">Dashboard</div>
 
-      <Button
-        onClick={() => dispatch(logOut(navigate))}
-        text="Logout"
-        // className="text-sm text-gray cursor-pointer"
-      />
+      <Button onClick={() => dispatch(logOut(navigate))} text="Logout" />
     </header>
   );
 };

@@ -24,16 +24,7 @@ const AuthInput = ({
         placeholder={placeholder}
         value={value}
         onChange={(e) => setData(e.target.value)}
-        className="
-          w-full rounded-md
-          border border-gray-300
-          px-3 py-2.5
-          text-sm
-          placeholder:text-gray-400
-          focus:border-secondary-1
-          focus:ring-2 focus:ring-secondary-2
-          outline-none
-        "
+        className="w-full rounded-md border border-gray-300 px-3 py-2.5 text-sm placeholder:text-gray-400 focus:border-secondary-1 focus:ring-2 focus:ring-secondary-2 outline-none"
       />
     </div>
   );
