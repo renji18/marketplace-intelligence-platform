@@ -34,11 +34,11 @@ export const NAV_ITEMS: NavItem[] = [
     path: "/seller/company",
     roles: [SELLER],
   },
-  // {
-  //   label: "My Products",
-  //   path: "/seller/products",
-  //   roles: [SELLER],
-  // },
+  {
+    label: "My Products",
+    path: "/seller/products",
+    roles: [SELLER],
+  },
   // {
   //   label: "Orders",
   //   path: "/orders",

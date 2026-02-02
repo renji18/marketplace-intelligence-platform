@@ -19,3 +19,10 @@ export const companyUrls = {
   getAllCompanies: "/company/all",
   toggleCompanyStatus: "/company/toggle/",
 };
+
+export const productUrls = {
+  getSellerProducts: "/product/my",
+  getAllProducts: "/product/all",
+  getSingleProduct: "/product/",
+  upsertProduct: "/product/modify"
+};

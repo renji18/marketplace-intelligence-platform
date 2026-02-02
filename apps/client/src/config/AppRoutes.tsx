@@ -22,10 +22,13 @@ import AllCompanies from "@/pages/admin/AllCompanies";
 import SellerDashboard from "@/pages/seller/Dashboard";
 import CreateCompany from "@/pages/seller/CreateCompany";
 import CompanyApprovalPending from "@/pages/seller/CompanyApprovalPending";
+import MyProducts from "@/pages/seller/MyProducts";
 
 // // buyer
 import BuyerDashboard from "@/pages/buyer/Dashboard";
 import MyCompany from "@/pages/seller/MyCompany";
+import UpsertProduct from "@/pages/seller/UpsertProduct";
+import ProductDetail from "@/components/product/ProductDetail";
 
 const AppRoutes = () => {
   return (
@@ -61,6 +64,15 @@ const AppRoutes = () => {
             <Route element={<RequireSellerCompany />}>
               <Route path="/seller/dashboard" element={<SellerDashboard />} />
               <Route path="/seller/company" element={<MyCompany />} />
+              <Route path="/seller/products" element={<MyProducts />} />
+              <Route
+                path="/seller/product/upsert"
+                element={<UpsertProduct />}
+              />
+              <Route
+                path="/seller/product/:productId"
+                element={<ProductDetail />}
+              />
             </Route>
           </Route>
 
