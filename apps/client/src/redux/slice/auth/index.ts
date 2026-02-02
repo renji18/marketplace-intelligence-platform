@@ -102,12 +102,13 @@ const auth = createSlice({
           state.error = null;
 
           const role = body.user?.role;
+          const path = window.location.pathname;
 
-          if (role === ADMIN) {
+          if (role === ADMIN && !path.startsWith("/admin")) {
             navigate("/admin/dashboard");
-          } else if (role === BUYER) {
+          } else if (role === BUYER && !path.startsWith("/buyer")) {
             navigate("/buyer/dashboard");
-          } else if (role === SELLER) {
+          } else if (role === SELLER && !path.startsWith("/seller")) {
             navigate("/seller/dashboard");
           }
         } else {

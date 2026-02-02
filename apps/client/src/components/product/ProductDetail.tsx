@@ -31,6 +31,8 @@ const ProductDetail = () => {
       } else {
         dispatch(getSingleProduct(productId));
       }
+    } else {
+      dispatch(getSingleProduct(productId));
     }
   }, [productId, dispatch, product, products]);
 

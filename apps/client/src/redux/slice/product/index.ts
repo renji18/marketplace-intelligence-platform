@@ -104,9 +104,7 @@ const company = createSlice({
           state.message = body?.message;
           toast.success(body?.message);
 
-          if (state.products) {
-            state.products = [...state.products, body?.product];
-          }
+          state.product = body?.product;
         }
 
         state.loading = false;
