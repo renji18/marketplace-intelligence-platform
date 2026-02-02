@@ -116,9 +116,11 @@ const auth = createSlice({
         }
 
         state.loading = false;
+        state.bootstrap = false;
       })
       .addCase(getUser.rejected, (state) => {
         state.loading = false;
+        state.bootstrap = false;
       });
 
     //Log out User

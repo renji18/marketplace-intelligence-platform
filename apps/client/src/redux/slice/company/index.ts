@@ -56,9 +56,11 @@ const company = createSlice({
         }
 
         state.loading = false;
+        state.bootstrap = false;
       })
       .addCase(getSellerCompany.rejected, (state) => {
         state.loading = false;
+        state.bootstrap = false;
       });
 
     // Get All companies
