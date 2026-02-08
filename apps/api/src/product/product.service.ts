@@ -114,29 +114,18 @@ export class ProductService {
           },
         });
       }
+
+      // remove product images
+      if (body?.removeProductImageIds?.length) {
+        await tx.productImage.deleteMany({
+          where: { id: { in: body?.removeProductImageIds } },
+        });
+      }
     });
 
     return {
       message: 'Product modified successfully',
       productId,
-    };
-  }
-
-  async removeProductImage(sellerId: string, productImageId: string) {
-    await prisma.productImage.delete({
-      where: {
-        id: productImageId,
-        product: {
-          company: {
-            ownerId: sellerId,
-            isDeleted: false,
-          },
-        },
-      },
-    });
-
-    return {
-      message: 'Image removed successfully',
     };
   }
 

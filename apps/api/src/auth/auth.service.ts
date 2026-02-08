@@ -4,21 +4,33 @@ import {
   Injectable,
   InternalServerErrorException,
   NotFoundException,
+  UnauthorizedException,
 } from '@nestjs/common';
 import { RegisterDto } from './dto/register.dto';
 import { prisma } from 'src/db/db';
-import { generateOTP, hashPassword, verifyPassword } from 'src/utils/password';
+import {
+  generateOTP,
+  generateTempPassword,
+  hashPassword,
+  verifyPassword,
+} from 'src/utils/password';
 import { LoginDto } from './dto/login.dto';
 import { JwtService } from '@nestjs/jwt';
 import { PayloadInterface } from '../interface/payload.interface';
 import { EnvConfigService } from 'src/config/env-manager.service';
 import { Role } from 'prisma/generated/prisma/enums';
+import { EmailService } from 'src/config/email.service';
+import { forgotPasswordEmail } from 'src/utils/email/forgot-password.email';
+import { ResetPasswordDto } from './dto/reset-password.dto';
+import { verifyEmailAccount } from 'src/utils/email/verify.email';
+import { sendLoginOtp } from 'src/utils/email/send-otp.email';
 
 @Injectable()
 export class AuthService {
   constructor(
     private readonly jwtService: JwtService,
     private readonly envService: EnvConfigService,
+    private readonly emailService: EmailService,
   ) {}
 
   async register(body: RegisterDto) {
@@ -70,64 +82,100 @@ export class AuthService {
   }
 
   async login(body: LoginDto) {
-    return prisma.$transaction(async (tx) => {
-      const user = await tx.user.findUnique({
-        where: { email: body.email, auth: { isDeleted: false } },
-        select: {
-          id: true,
-          email: true,
-          role: true,
-          auth: { select: { id: true, password: true } },
-          seller: { select: { id: true } },
-          buyer: { select: { id: true } },
-          admin: { select: { id: true } },
-        },
-      });
-
-      if (!user) {
-        throw new NotFoundException('User not found');
-      }
-
-      const validpassword = await verifyPassword(
-        body?.password,
-        user.auth.password,
-      );
-
-      if (!validpassword) {
-        throw new BadRequestException('Invalid credentials');
-      }
-
-      const otp = generateOTP();
-      console.log(otp, 'THE OTP');
-      const encryptedOtp = await hashPassword(otp);
-
-      await tx.auth.update({
-        where: { id: user.auth.id },
-        data: {
-          otp: encryptedOtp,
-          otpValidUntil: new Date(Date.now() + 15 * 60 * 1000),
-        },
-      });
-
-      const roleId: string =
-        user?.admin?.id ?? user?.seller?.id ?? user?.buyer?.id ?? 'NA';
-
-      if (roleId === 'NA') {
-        throw new NotFoundException('Unknown user');
-      }
-
-      const payload: PayloadInterface = {
-        email: user.email,
-        userId: user.id,
-        roleName: user.role,
-        roleId,
-        verified: false,
-      };
-
-      const tokens = await this._generateTokens(payload);
-
-      return tokens;
+    const user = await prisma.user.findUnique({
+      where: { email: body.email, auth: { isDeleted: false } },
+      select: {
+        id: true,
+        email: true,
+        role: true,
+        firstName: true,
+        auth: { select: { id: true, password: true, verified: true } },
+        seller: { select: { id: true } },
+        buyer: { select: { id: true } },
+        admin: { select: { id: true } },
+      },
     });
+
+    if (!user) {
+      throw new NotFoundException('User not found');
+    }
+
+    if (!user?.auth?.verified) {
+      const tempPassword = generateTempPassword();
+
+      console.log(tempPassword, 'VERIFY ACCOUNT TEMP PASSWORD');
+
+      await prisma.auth.update({
+        where: { userId: user.id },
+        data: {
+          tempPassword: await hashPassword(tempPassword),
+          tempPasswordTimestamp: new Date(
+            new Date().getTime() + 60 * 60 * 1000,
+          ),
+        },
+      });
+
+      await this.emailService.sendEmail({
+        to: body.email,
+        subject: 'Verify your account',
+        html: verifyEmailAccount(
+          `${this.envService.appOptions.client_url}/reset-password?email=${encodeURIComponent(body.email)}`,
+          tempPassword,
+        ),
+      });
+
+      return {
+        message: 'User not verified. Verification email sent successfully!',
+        access_token: null,
+        refresh_token: null,
+      };
+    }
+
+    const validpassword = await verifyPassword(
+      body?.password,
+      user.auth.password,
+    );
+
+    if (!validpassword) {
+      throw new BadRequestException('Invalid credentials');
+    }
+
+    const otp = generateOTP();
+    console.log(otp, 'THE OTP');
+    const encryptedOtp = await hashPassword(otp);
+
+    await prisma.auth.update({
+      where: { id: user.auth.id },
+      data: {
+        otp: encryptedOtp,
+        otpValidUntil: new Date(Date.now() + 15 * 60 * 1000),
+      },
+    });
+
+    await this.emailService.sendEmail({
+      to: body.email,
+      subject: 'Your One-Time Password (OTP) for Login Verification',
+      html: sendLoginOtp(user.firstName, otp),
+    });
+
+    const roleId: string =
+      user?.admin?.id ?? user?.seller?.id ?? user?.buyer?.id ?? 'NA';
+
+    if (roleId === 'NA') {
+      throw new NotFoundException('Unknown user');
+    }
+
+    const payload: PayloadInterface = {
+      email: user.email,
+      userId: user.id,
+      roleName: user.role,
+      roleId,
+      verified: false,
+    };
+
+    const tokens = await this._generateTokens(payload);
+
+    return { ...tokens, message: 'OTP sent successfully' };
   }
 
   async verifyOtp(payload: PayloadInterface, otp: string) {
@@ -209,6 +257,123 @@ export class AuthService {
     });
 
     return accessToken;
+  }
+
+  async resetPassword(userId: string, body: ResetPasswordDto) {
+    const user = await prisma.user.findUnique({
+      where: { id: userId },
+      select: { auth: { select: { id: true, password: true } } },
+    });
+
+    if (!user) {
+      throw new NotFoundException('User not found');
+    }
+
+    const isPasswordValid = await verifyPassword(
+      body.oldPassword,
+      user.auth.password,
+    );
+
+    if (!isPasswordValid) {
+      throw new UnauthorizedException('Invalid credentials');
+    }
+
+    return prisma.$transaction(async (tx) => {
+      await tx.auth.update({
+        where: { id: user.auth.id },
+        data: {
+          password: await hashPassword(body.newPassword),
+        },
+      });
+
+      return true;
+    });
+  }
+
+  async sendForgotPasswordEmail(email: string) {
+    if (!email) {
+      throw new NotFoundException('Email not provided');
+    }
+
+    const user = await prisma.user.findUnique({
+      where: { email },
+      select: { id: true, auth: { select: { id: true } } },
+    });
+
+    if (!user) {
+      throw new NotFoundException('User not found');
+    }
+
+    const tempPassword = generateTempPassword();
+
+    console.log(tempPassword, 'FORGOT PASSWORD TEMP PASSWORD');
+
+    await prisma.$transaction(async (tx) => {
+      await tx.auth.update({
+        where: { id: user.auth.id },
+        data: {
+          tempPassword: await hashPassword(tempPassword),
+          tempPasswordTimestamp: new Date(
+            new Date().getTime() + 60 * 60 * 1000,
+          ),
+        },
+      });
+    });
+
+    await this.emailService.sendEmail({
+      to: email,
+      subject: `Forgot password for email ${email}`,
+      html: forgotPasswordEmail(
+        `${this.envService.appOptions.client_url}/reset-password?email=${encodeURIComponent(email)}`,
+        tempPassword,
+      ),
+    });
+
+    return {
+      message: 'Forgot Password email sent successfully!',
+    };
+  }
+
+  async verifyAndReset(body: ResetPasswordDto) {
+    const user = await prisma.user.findUnique({
+      where: { email: body.email },
+      select: {
+        auth: {
+          select: { id: true, tempPassword: true, tempPasswordTimestamp: true },
+        },
+      },
+    });
+
+    if (!user) {
+      throw new NotFoundException('User not found');
+    }
+
+    if (new Date() >= user?.auth?.tempPasswordTimestamp) {
+      throw new UnauthorizedException('OTP expired');
+    }
+
+    const isPasswordValid = await verifyPassword(
+      body?.oldPassword,
+      user?.auth?.tempPassword,
+    );
+
+    if (!isPasswordValid) {
+      throw new UnauthorizedException('Invalid credentials');
+    }
+
+    await prisma.auth.update({
+      where: { id: user?.auth?.id },
+      data: {
+        verified: true,
+        password: await hashPassword(body.newPassword),
+        tempPassword: null,
+        tempPasswordTimestamp: new Date(Date.now()),
+      },
+    });
+
+    return {
+      message: 'Password reset successfully',
+    };
   }
 
   // ============================= PRIVATE METHODS =============================

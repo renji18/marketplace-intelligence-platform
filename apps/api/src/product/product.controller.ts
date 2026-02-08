@@ -1,12 +1,4 @@
-import {
-  Body,
-  Controller,
-  Delete,
-  Get,
-  Param,
-  Post,
-  Req,
-} from '@nestjs/common';
+import { Body, Controller, Get, Param, Post, Req } from '@nestjs/common';
 import { ProductService } from './product.service';
 import { Seller } from 'src/auth/utils/roles.decorator';
 import { Request } from 'express';
@@ -28,18 +20,6 @@ export class ProductController {
   @Post('modify')
   modifyProduct(@Req() req: Request, @Body() body: ProductDto) {
     return this.productService.modifyProduct(getPayload(req).roleId, body);
-  }
-
-  @Seller()
-  @Delete('image/:productImageId')
-  removeProductImage(
-    @Req() req: Request,
-    @Param('productImageId') productImageId: string,
-  ) {
-    return this.productService.removeProductImage(
-      getPayload(req).roleId,
-      productImageId,
-    );
   }
 
   @Public()

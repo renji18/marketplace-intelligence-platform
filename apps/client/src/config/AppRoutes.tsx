@@ -29,6 +29,9 @@ import BuyerDashboard from "@/pages/buyer/Dashboard";
 import MyCompany from "@/pages/seller/MyCompany";
 import UpsertProduct from "@/pages/seller/UpsertProduct";
 import ProductDetail from "@/components/product/ProductDetail";
+import ForgotPassword from "@/pages/auth/ForgotPassword";
+import CheckEmail from "@/pages/auth/CheckEmail";
+import ResetPassword from "@/pages/auth/ResetPassword";
 
 const AppRoutes = () => {
   return (
@@ -36,6 +39,9 @@ const AppRoutes = () => {
       {/* ───────────── Public ───────────── */}
       <Route path="/login" element={<SignIn />} />
       <Route path="/verify-otp" element={<VerifyOtp />} />
+      <Route path="/forgot-password" element={<ForgotPassword />} />
+      <Route path="/forgot-password/check-email" element={<CheckEmail />} />
+      <Route path="/reset-password" element={<ResetPassword />} />
 
       {/* ───────────── Authenticated ───────────── */}
       <Route element={<RequireAuth />}>

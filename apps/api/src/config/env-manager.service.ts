@@ -16,6 +16,7 @@ export default registerAs('env', () => ({
 
   port: process.env.PORT,
   client_url: process.env.CLIENT_URL,
+  env: process.env.ENV,
 }));
 
 @Injectable()
@@ -50,6 +51,7 @@ export class EnvConfigService {
     return {
       port: this.env.port,
       client_url: this.env.client_url,
+      env: this.env.env,
     };
   }
 }

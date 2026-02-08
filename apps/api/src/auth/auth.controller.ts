@@ -15,6 +15,8 @@ import { Request, Response } from 'express';
 import { Public } from './utils/public.decorator';
 import { EnvConfigService } from 'src/config/env-manager.service';
 import { AccessWithoutVerification } from './utils/access-without-verification.decorator';
+import { ResetPasswordDto } from './dto/reset-password.dto';
+import { getPayload } from 'src/utils/get-payload';
 
 @Controller('auth')
 export class AuthController {
@@ -55,19 +57,23 @@ export class AuthController {
       throw new InternalServerErrorException('Error generating tokens');
     }
 
-    res
-      .cookie(
-        this.cookies.access_cookie,
-        tokens.access_token,
-        this.getCookieOptions(),
-      )
-      .cookie(
-        this.cookies.refresh_cookie,
-        tokens.refresh_token,
-        this.getCookieOptions(),
-      )
-      .status(200)
-      .json({ message: 'OTP sent successfully' });
+    if (tokens?.access_token) {
+      res
+        .cookie(
+          this.cookies.access_cookie,
+          tokens?.access_token,
+          this.getCookieOptions(),
+        )
+        .cookie(
+          this.cookies.refresh_cookie,
+          tokens?.refresh_token,
+          this.getCookieOptions(),
+        )
+        .status(200)
+        .json({ message: tokens?.message });
+    } else {
+      res.status(201).json({ message: tokens?.message });
+    }
   }
 
   @AccessWithoutVerification()
@@ -122,6 +128,44 @@ export class AuthController {
       .json({
         message: 'Token refreshed',
       });
+  }
+
+  @Post('reset-password')
+  async resetPassword(
+    @Req() req: Request,
+    @Body() body: ResetPasswordDto,
+    @Res() res: Response,
+  ) {
+    await this.authService.resetPassword(getPayload(req).userId, body);
+
+    res
+      .clearCookie(this.cookies.access_cookie, this.getCookieOptions())
+      .clearCookie(this.cookies.refresh_cookie, this.getCookieOptions())
+      .status(200)
+      .json({ message: 'Password updated successfully' });
+  }
+
+  @Public()
+  @Post('forgot-password')
+  async sendForgotPasswordEmail(
+    @Body() body: { email: string },
+    @Res() res: Response,
+  ) {
+    const response = await this.authService.sendForgotPasswordEmail(
+      body?.email,
+    );
+
+    return res
+      .status(200)
+      .clearCookie(this.cookies.access_cookie, this.getCookieOptions())
+      .clearCookie(this.cookies.refresh_cookie, this.getCookieOptions())
+      .json(response);
+  }
+
+  @Public()
+  @Post('verify-and-reset')
+  verifyAndReset(@Body() body: ResetPasswordDto) {
+    return this.authService.verifyAndReset(body);
   }
 
   @Public()

@@ -74,7 +74,7 @@ export const verifyOtp = createAsyncThunk(
   },
 );
 
-//Get User
+// Get User
 export const getUser = createAsyncThunk(
   "getUser",
   async (navigate: NavigateFunction, { rejectWithValue }) => {
@@ -91,7 +91,58 @@ export const getUser = createAsyncThunk(
   },
 );
 
-//Log out User
+// Send forgot password email
+export const sendForgotPasswordEmail = createAsyncThunk(
+  "sendForgotPasswordEmail",
+  async (
+    data: { email: string; navigate: NavigateFunction },
+    { rejectWithValue },
+  ) => {
+    try {
+      const res = await apiClient.post(authUrls.forgotpassword, {
+        email: data.email,
+      });
+
+      return { body: res.data, status: res.status, navigate: data.navigate };
+    } catch (error) {
+      if (error instanceof AxiosError && error?.response) {
+        return rejectWithValue(error?.response?.data["error"]);
+      }
+      return rejectWithValue("An unexpected error occurred.");
+    }
+  },
+);
+
+// Verify and reset
+export const verifyAndReset = createAsyncThunk(
+  "verifyAndReset",
+  async (
+    data: {
+      email: string;
+      oldPassword: string;
+      newPassword: string;
+      navigate: NavigateFunction;
+    },
+    { rejectWithValue },
+  ) => {
+    try {
+      const res = await apiClient.post(authUrls.verifyAndReset, {
+        email: data.email,
+        oldPassword: data.oldPassword,
+        newPassword: data.newPassword,
+      });
+
+      return { body: res.data, status: res.status, navigate: data.navigate };
+    } catch (error) {
+      if (error instanceof AxiosError && error?.response) {
+        return rejectWithValue(error?.response?.data["error"]);
+      }
+      return rejectWithValue("An unexpected error occurred.");
+    }
+  },
+);
+
+// Log out User
 export const logOut = createAsyncThunk(
   "logOut",
   async (navigate: NavigateFunction, { rejectWithValue }) => {

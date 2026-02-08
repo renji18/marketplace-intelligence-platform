@@ -1,5 +1,6 @@
 import { Type } from 'class-transformer';
 import {
+  IsArray,
   IsInt,
   IsNotEmpty,
   IsNumber,
@@ -45,4 +46,9 @@ export class ProductDto {
   @IsNotEmpty()
   @IsString()
   category: string;
+
+  @IsOptional()
+  @IsArray()
+  @IsString({ each: true })
+  removeProductImageIds?: string[];
 }

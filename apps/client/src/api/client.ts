@@ -14,7 +14,12 @@ const apiClient = axios.create({
 });
 
 // This is the array, which includes frontend urls which should be accessed without token verification
-const EXCLUDE_URL = ["/login", "/shop"];
+const EXCLUDE_URL = [
+  "/login",
+  "/verify-otp",
+  "/forgot-password",
+  "/reset-password",
+];
 
 // Response Interceptor
 apiClient.interceptors.response.use(

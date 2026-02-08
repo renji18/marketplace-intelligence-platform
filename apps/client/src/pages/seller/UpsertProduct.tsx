@@ -28,6 +28,10 @@ const UpsertProduct = () => {
     price: 0,
     category: "",
   });
+  const [activeImage, setActiveImage] = useState<string | null>(null);
+  const [removeProductImageIds, setRemoveProductImageIds] = useState<string[]>(
+    [],
+  );
 
   useEffect(() => {
     if (product && isEdit) {
@@ -38,8 +42,12 @@ const UpsertProduct = () => {
         price: Number(product.productPrices?.[0]?.price),
         priceReason: product.productPrices?.[0]?.reason ?? "",
         category: product.productCategory?.name ?? "",
-        image: product.productImages?.[0]?.image ?? "",
+        image: product.productImages?.[0]?.id ?? "",
       });
+
+      if (product.productImages?.length) {
+        setActiveImage(product.productImages[0].image);
+      }
     }
   }, [product, isEdit]);
 
@@ -61,6 +69,72 @@ const UpsertProduct = () => {
       <h1 className="text-2xl font-semibold text-secondary-1">
         {isEdit ? "Edit product" : "Create product"}
       </h1>
+
+      {isEdit &&
+        product?.productImages &&
+        product?.productImages?.length > 0 && (
+          <div className="bg-white border rounded-md p-4 space-y-4">
+            {/* Poster */}
+            <img
+              src={activeImage ?? ""}
+              alt="Product"
+              className="w-full h-64 object-cover rounded-md"
+            />
+
+            {/* Thumbnails */}
+            <div className="flex gap-3 overflow-x-auto">
+              {product.productImages.map((img) => {
+                const markedForRemoval = removeProductImageIds.includes(img.id);
+
+                return (
+                  <div
+                    key={img.id}
+                    className={`relative h-16 w-16 rounded-md border overflow-hidden ${
+                      markedForRemoval
+                        ? "opacity-40"
+                        : activeImage === img.image
+                          ? "ring-2 ring-primary-1"
+                          : "opacity-80 hover:opacity-100"
+                    }`}
+                  >
+                    <button
+                      type="button"
+                      onClick={() => setActiveImage(img.image)}
+                      className="h-full w-full"
+                    >
+                      <img
+                        src={img.image}
+                        alt="thumbnail"
+                        className="h-full w-full object-cover"
+                      />
+                    </button>
+
+                    {/* Remove button */}
+                    <button
+                      type="button"
+                      onClick={() =>
+                        setRemoveProductImageIds((prev) =>
+                          prev.includes(img.id)
+                            ? prev.filter((id) => id !== img.id)
+                            : [...prev, img.id],
+                        )
+                      }
+                      className="absolute top-0 right-0 bg-black/60 text-white text-xs px-1"
+                    >
+                      ✕
+                    </button>
+                  </div>
+                );
+              })}
+            </div>
+
+            {removeProductImageIds.length > 0 && (
+              <p className="text-xs text-gray">
+                {removeProductImageIds.length} image(s) will be removed on save
+              </p>
+            )}
+          </div>
+        )}
 
       <div className="bg-white border rounded-md p-6 space-y-4">
         <FormInput

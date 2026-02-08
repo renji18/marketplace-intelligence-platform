@@ -1,6 +1,13 @@
 import { createSlice } from "@reduxjs/toolkit";
 import { initialState } from "./initialState";
-import { getUser, loginUser, logOut, verifyOtp } from "./asyncFn";
+import {
+  getUser,
+  loginUser,
+  logOut,
+  sendForgotPasswordEmail,
+  verifyAndReset,
+  verifyOtp,
+} from "./asyncFn";
 import { toast } from "sonner";
 import type { NavigateFunction } from "react-router-dom";
 import { ADMIN, BUYER, SELLER } from "@/utils/assets";
@@ -25,6 +32,11 @@ const auth = createSlice({
           state.message = body?.message;
           state.error = null;
           navigate("/verify-otp");
+        } else if (status === 201) {
+          toast.success(body?.message);
+          state.message = body?.message;
+          state.error = null;
+          navigate("/forgot-password/check-email");
         } else {
           toast.error("Login Error");
         }
@@ -122,6 +134,52 @@ const auth = createSlice({
       .addCase(getUser.rejected, (state) => {
         state.loading = false;
         state.bootstrap = false;
+      });
+
+    // Send forgot password email
+    builder
+      .addCase(sendForgotPasswordEmail.pending, (state) => {
+        state.loading = true;
+        state.error = null;
+      })
+      .addCase(sendForgotPasswordEmail.fulfilled, (state, action) => {
+        const { body, status, navigate } = action.payload;
+
+        if (status === 200) {
+          state.message = body?.message;
+          state.error = null;
+          navigate("/forgot-password/check-email");
+        } else {
+          toast.error("Error sending reset password email");
+        }
+
+        state.loading = false;
+      })
+      .addCase(sendForgotPasswordEmail.rejected, (state) => {
+        state.loading = false;
+      });
+
+    // Send forgot password email
+    builder
+      .addCase(verifyAndReset.pending, (state) => {
+        state.loading = true;
+        state.error = null;
+      })
+      .addCase(verifyAndReset.fulfilled, (state, action) => {
+        const { body, status, navigate } = action.payload;
+
+        if (status === 201) {
+          state.message = body?.message;
+          state.error = null;
+          navigate("/login");
+        } else {
+          toast.error("Error sending reset password email");
+        }
+
+        state.loading = false;
+      })
+      .addCase(verifyAndReset.rejected, (state) => {
+        state.loading = false;
       });
 
     //Log out User

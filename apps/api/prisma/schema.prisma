@@ -40,11 +40,14 @@ model User {
 }
 
 model Auth {
-  id            String    @id @default(uuid(7))
-  password      String
-  otp           String?
-  otpValidUntil DateTime?
-  isDeleted     Boolean   @default(false)
+  id                    String    @id @default(uuid(7))
+  password              String
+  otp                   String?
+  otpValidUntil         DateTime?
+  tempPassword          String?
+  tempPasswordTimestamp DateTime?
+  isDeleted             Boolean   @default(false)
+  verified              Boolean   @default(false)
 
   user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
   userId String

@@ -52,7 +52,10 @@ const SignIn = () => {
 
         {/* Actions */}
         <div className="flex justify-end">
-          <button className="text-sm text-secondary-1 hover:underline">
+          <button
+            className="text-sm text-secondary-1 hover:underline"
+            onClick={() => navigate("/forgot-password")}
+          >
             Forgot password?
           </button>
         </div>

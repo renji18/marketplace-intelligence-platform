@@ -3,11 +3,8 @@ export const authUrls = {
   verifyOtp: "/auth/verify-otp",
   getUser: "/user/me",
   refreshToken: "/auth/refresh",
-  validateUser: "/assets/permissions",
-  onboardUser: "/user/onboard",
   forgotpassword: "/auth/forgot-password",
-  forgotpasswordReset: "/auth/forgot-password-reset",
-  signedUrl: "/signed-url/?key=",
+  verifyAndReset: "/auth/verify-and-reset",
   updateUser: "/user/edit",
   resetPassword: "/auth/reset-password",
   logout: "/auth/logout",
@@ -24,5 +21,5 @@ export const productUrls = {
   getSellerProducts: "/product/my",
   getAllProducts: "/product/all",
   getSingleProduct: "/product/",
-  upsertProduct: "/product/modify"
+  upsertProduct: "/product/modify",
 };
