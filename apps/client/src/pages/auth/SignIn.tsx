@@ -70,7 +70,10 @@ const SignIn = () => {
 
         <p className="text-center text-sm text-secondary-1">
           Don&apos;t have an account?{" "}
-          <span className="font-medium cursor-pointer hover:underline">
+          <span
+            onClick={() => navigate("/register")}
+            className="font-medium cursor-pointer hover:underline"
+          >
             Create one
           </span>
         </p>

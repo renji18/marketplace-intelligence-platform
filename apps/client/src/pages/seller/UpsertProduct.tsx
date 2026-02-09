@@ -58,6 +58,7 @@ const UpsertProduct = () => {
           ...(isEdit && { id: product?.id }),
           ...form,
           image: Number(form.image),
+          removeProductImageIds,
         },
         navigate,
       }),
@@ -78,7 +79,7 @@ const UpsertProduct = () => {
             <img
               src={activeImage ?? ""}
               alt="Product"
-              className="w-full h-64 object-cover rounded-md"
+              className="w-full h-64 object-contain rounded-md"
             />
 
             {/* Thumbnails */}

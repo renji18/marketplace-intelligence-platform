@@ -10,6 +10,7 @@ export interface ProductInterface {
     id: string;
     price: string;
     reason?: string;
+    createdAt: string;
   }>;
   productImages?: Array<{
     id: string;

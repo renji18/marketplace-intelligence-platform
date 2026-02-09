@@ -25,7 +25,7 @@ const App = () => {
     }
   }, [company, user?.seller, dispatch]);
 
-  if (authBootstrap || companyBootstrap) {
+  if (authBootstrap || (user?.seller && companyBootstrap)) {
     return (
       <div className="h-screen w-screen flex items-center justify-center">
         Loading...

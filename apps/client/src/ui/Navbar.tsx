@@ -1,7 +1,7 @@
 import { logOut } from "@/redux/slice/auth/asyncFn";
 import { type MyDispatch } from "@/redux/store";
 import { useDispatch } from "react-redux";
-import { useNavigate } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import Button from "./Button";
 
 const Navbar = ({ onMenuClick }: { onMenuClick: () => void }) => {
@@ -16,7 +16,12 @@ const Navbar = ({ onMenuClick }: { onMenuClick: () => void }) => {
 
       <div className="flex-1 font-medium text-secondary-1">Dashboard</div>
 
-      <Button onClick={() => dispatch(logOut(navigate))} text="Logout" />
+      <div className="flex items-center gap-4">
+        <Link to="/products" className="text-sm text-gray">
+          Products
+        </Link>
+        <Button onClick={() => dispatch(logOut(navigate))} text="Logout" />
+      </div>
     </header>
   );
 };

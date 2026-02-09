@@ -23,6 +23,7 @@ export class ProductService {
             id: true,
             price: true,
             reason: true,
+            createdAt: true,
           },
         },
         productImages: {
@@ -62,7 +63,7 @@ export class ProductService {
       select: { id: true },
     });
 
-    let productId = '';
+    let productId: string;
 
     await prisma.$transaction(async (tx) => {
       if (!category) {
@@ -89,13 +90,23 @@ export class ProductService {
           companyId: company.id,
           totalQuantity: body.quantity,
         },
-        select: { id: true },
+        select: {
+          id: true,
+          productPrices: {
+            take: 1,
+            orderBy: { createdAt: 'desc' },
+            select: { price: true },
+          },
+        },
       });
 
       productId = product.id;
 
       // price
-      if (body?.price) {
+      if (
+        body?.price &&
+        body?.price !== Number(product?.productPrices?.[0]?.price)
+      ) {
         await tx.productPrice.create({
           data: {
             price: body.price,
@@ -109,7 +120,7 @@ export class ProductService {
       if (body?.image) {
         await tx.productImage.create({
           data: {
-            image: `https://picsum.photos/id/${body.image}/200/300`,
+            image: `https://picsum.photos/id/${body.image}/300/300`,
             productId,
           },
         });
@@ -168,6 +179,7 @@ export class ProductService {
             id: true,
             price: true,
             reason: true,
+            createdAt: true,
           },
         },
       },
@@ -206,6 +218,7 @@ export class ProductService {
             id: true,
             price: true,
             reason: true,
+            createdAt: true,
           },
         },
       },

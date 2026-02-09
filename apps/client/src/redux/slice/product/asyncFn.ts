@@ -18,6 +18,7 @@ export const upsertProduct = createAsyncThunk(
         priceReason?: string;
         image?: number;
         category: string;
+        removeProductImageIds?: string[];
       };
       navigate: NavigateFunction;
     },

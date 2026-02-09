@@ -32,16 +32,26 @@ import ProductDetail from "@/components/product/ProductDetail";
 import ForgotPassword from "@/pages/auth/ForgotPassword";
 import CheckEmail from "@/pages/auth/CheckEmail";
 import ResetPassword from "@/pages/auth/ResetPassword";
+import Products from "@/pages/public/Products";
+import PublicLayout from "@/ui/PublictLayout";
+import Register from "@/pages/auth/Register";
 
 const AppRoutes = () => {
   return (
     <Routes>
       {/* ───────────── Public ───────────── */}
       <Route path="/login" element={<SignIn />} />
+      <Route path="/register" element={<Register />} />
       <Route path="/verify-otp" element={<VerifyOtp />} />
       <Route path="/forgot-password" element={<ForgotPassword />} />
       <Route path="/forgot-password/check-email" element={<CheckEmail />} />
       <Route path="/reset-password" element={<ResetPassword />} />
+
+      {/* ───────────── Public but INSIDE Layout ───────────── */}
+      <Route element={<PublicLayout />}>
+        <Route path="/products" element={<Products />} />
+        <Route path="/product/:productId" element={<ProductDetail />} />
+      </Route>
 
       {/* ───────────── Authenticated ───────────── */}
       <Route element={<RequireAuth />}>

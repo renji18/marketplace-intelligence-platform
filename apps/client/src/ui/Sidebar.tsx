@@ -1,4 +1,4 @@
-import { NavLink } from "react-router-dom";
+import { Link, NavLink } from "react-router-dom";
 import { NAV_ITEMS } from "@/config/navigation";
 import { MySelector } from "@/redux/store";
 import logo from "@/assets/logo-white.png";
@@ -28,7 +28,9 @@ const Sidebar = ({ open, onClose }: { open: boolean; onClose: () => void }) => {
       >
         {/* Logo */}
         <div className="h-16 flex items-center px-6 font-bold text-lg justify-center">
-          <img src={logo} alt="logo" className="h-12" />
+          <Link to="/products" className="font-bold text-secondary-1">
+            <img src={logo} alt="logo" className="h-12" />
+          </Link>
         </div>
 
         {/* Nav */}

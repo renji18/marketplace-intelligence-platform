@@ -6,6 +6,7 @@ export const initialState: {
   error: string | null;
   message: string | null;
   user?: UserInterface;
+  buyerNavigateLink?: string;
 } = {
   bootstrap: true,
   loading: true,

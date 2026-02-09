@@ -55,7 +55,10 @@ const Button = ({
     <button
       type="button"
       disabled={disabled}
-      onClick={onClick}
+      onClick={(e) => {
+        e.stopPropagation();
+        onClick?.();
+      }}
       className={`
         ${base}
         ${sizes[size]}

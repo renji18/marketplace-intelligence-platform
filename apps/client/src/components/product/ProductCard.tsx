@@ -1,4 +1,6 @@
+import { useCart } from "@/hooks/useCart";
 import type { ProductInterface } from "@/interfaces/product.interface";
+import Button from "@/ui/Button";
 import { useNavigate } from "react-router-dom";
 
 const ProductCard = ({
@@ -9,6 +11,7 @@ const ProductCard = ({
   addToCart?: boolean;
 }) => {
   const navigate = useNavigate();
+  const { handleAddToCart } = useCart();
 
   const image =
     product.productImages?.[0]?.image ?? "https://via.placeholder.com/200";
@@ -16,17 +19,17 @@ const ProductCard = ({
   const price = product.productPrices?.[0]?.price;
 
   const openProductPage = () => {
-    navigate("/seller/product/" + product?.id);
+    if (addToCart) {
+      navigate("/product/" + product?.id);
+    } else {
+      navigate("/seller/product/" + product?.id);
+    }
   };
 
   return (
     <div
       onClick={openProductPage}
-      className="
-        bg-white border rounded-md shadow-sm p-4
-        flex gap-4 cursor-pointer
-        hover:shadow-md transition
-      "
+      className="bg-white border rounded-md shadow-sm p-4 flex items-center gap-4 cursor-pointer hover:shadow-md transition"
     >
       {/* Image */}
       <img
@@ -60,9 +63,13 @@ const ProductCard = ({
 
       {/* Optional footer / secondary action */}
       {addToCart && (
-        <div onClick={(e) => e.stopPropagation()} className="flex items-center">
-          Add to cart
-        </div>
+        <Button
+          text="Add to cart"
+          onClick={() => {
+            handleAddToCart(product.id);
+          }}
+          className="flex items-center max-h-fit"
+        />
       )}
     </div>
   );

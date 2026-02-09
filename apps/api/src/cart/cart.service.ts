@@ -150,6 +150,13 @@ export class CartService {
               select: {
                 id: true,
                 name: true,
+                productImages: {
+                  take: 1,
+                  orderBy: { createdAt: 'desc' },
+                  select: {
+                    image: true,
+                  },
+                },
               },
             },
           },

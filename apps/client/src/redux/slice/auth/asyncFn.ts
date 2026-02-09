@@ -1,8 +1,53 @@
 import apiClient from "@/api/client";
 import { authUrls } from "@/api/urls";
+import type { BUYER, SELLER } from "@/utils/assets";
 import { createAsyncThunk } from "@reduxjs/toolkit";
 import { AxiosError } from "axios";
 import type { NavigateFunction } from "react-router-dom";
+
+// Register
+export const registerUser = createAsyncThunk(
+  "registerUser",
+  async (
+    data: {
+      firstName: string;
+      lastName: string;
+      email: string;
+      role: typeof BUYER | typeof SELLER;
+      phoneNumber?: string;
+      password: string;
+      navigate: NavigateFunction;
+    },
+    { rejectWithValue },
+  ) => {
+    try {
+      const res = await apiClient.post(authUrls?.register, {
+        firstName: data?.firstName,
+        lastName: data?.lastName,
+        email: data?.email,
+        role: data?.role,
+        phoneNumber: data?.phoneNumber,
+        password: data?.password,
+      });
+
+      return {
+        body: res.data,
+        status: res.status,
+        navigate: data?.navigate,
+      };
+    } catch (error) {
+      let message = "An unexpected error occurred.";
+      if (error instanceof AxiosError && error?.response) {
+        message = error?.response?.data["error"];
+      }
+
+      return rejectWithValue({
+        error: message,
+        navigate: data?.navigate,
+      });
+    }
+  },
+);
 
 // Login
 export const loginUser = createAsyncThunk(

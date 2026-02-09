@@ -9,8 +9,8 @@ import {
 import { toast } from "sonner";
 import type { NavigateFunction } from "react-router-dom";
 
-const company = createSlice({
-  name: "company",
+const product = createSlice({
+  name: "product",
   initialState,
   reducers: {
     setProduct: (state, action) => {
@@ -63,6 +63,7 @@ const company = createSlice({
         if (status === 200) {
           state.products = body?.products;
           state.message = body?.message;
+          state.product = undefined;
         }
 
         state.loading = false;
@@ -115,6 +116,6 @@ const company = createSlice({
   },
 });
 
-export const { setProduct } = company.actions;
+export const { setProduct } = product.actions;
 
-export default company.reducer;
+export default product.reducer;

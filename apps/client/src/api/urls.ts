@@ -1,4 +1,5 @@
 export const authUrls = {
+  register: "/auth/register",
   login: "/auth/login",
   verifyOtp: "/auth/verify-otp",
   getUser: "/user/me",
@@ -22,4 +23,10 @@ export const productUrls = {
   getAllProducts: "/product/all",
   getSingleProduct: "/product/",
   upsertProduct: "/product/modify",
+};
+
+export const cartUrls = {
+  addToCart: "/cart/add/",
+  removeFromCart: "/cart/remove/",
+  getMyCart: "/cart/get",
 };

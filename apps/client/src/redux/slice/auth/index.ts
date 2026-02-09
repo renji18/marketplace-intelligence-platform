@@ -4,6 +4,7 @@ import {
   getUser,
   loginUser,
   logOut,
+  registerUser,
   sendForgotPasswordEmail,
   verifyAndReset,
   verifyOtp,
@@ -15,8 +16,45 @@ import { ADMIN, BUYER, SELLER } from "@/utils/assets";
 const auth = createSlice({
   name: "auth",
   initialState,
-  reducers: {},
+  reducers: {
+    setBuyerNavigateToLink: (state, action) => {
+      state.buyerNavigateLink = action.payload;
+    },
+  },
   extraReducers(builder) {
+    // Register
+    builder
+      .addCase(registerUser.pending, (state) => {
+        state.loading = true;
+        state.error = null;
+      })
+      .addCase(registerUser.fulfilled, (state, action) => {
+        state.loading = false;
+        const { body, status, navigate } = action.payload;
+
+        if (status === 201) {
+          toast.success(body?.message);
+          state.message = body?.message;
+          state.error = null;
+          navigate("/login");
+        } else {
+          toast.error("Registration Error");
+        }
+      })
+      .addCase(registerUser.rejected, (state, action) => {
+        const payload = action.payload as {
+          error: string;
+          navigate: NavigateFunction;
+        };
+
+        if (typeof payload?.error === "string") {
+          state.error = payload.error;
+          toast.error(payload.error);
+        }
+
+        state.loading = false;
+      });
+
     //Login
     builder
       .addCase(loginUser.pending, (state) => {
@@ -76,7 +114,7 @@ const auth = createSlice({
           if (role === ADMIN) {
             navigate("/admin/dashboard");
           } else if (role === BUYER) {
-            navigate("/buyer/dashboard");
+            navigate(state.buyerNavigateLink ?? "/buyer/dashboard");
           } else if (role === SELLER) {
             navigate("/seller/dashboard");
           }
@@ -118,8 +156,12 @@ const auth = createSlice({
 
           if (role === ADMIN && !path.startsWith("/admin")) {
             navigate("/admin/dashboard");
-          } else if (role === BUYER && !path.startsWith("/buyer")) {
-            navigate("/buyer/dashboard");
+          } else if (
+            role === BUYER &&
+            !path.startsWith("/buyer") &&
+            !path.startsWith("/products")
+          ) {
+            navigate(state.buyerNavigateLink ?? "/buyer/dashboard");
           } else if (role === SELLER && !path.startsWith("/seller")) {
             navigate("/seller/dashboard");
           }
@@ -205,6 +247,6 @@ const auth = createSlice({
   },
 });
 
-// export const {} = auth.actions
+export const { setBuyerNavigateToLink } = auth.actions;
 
 export default auth.reducer;
